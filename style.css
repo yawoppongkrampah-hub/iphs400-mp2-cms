@@ -1,0 +1,11 @@
+/* Minimal starter styles — make them yours. */
+:root { color-scheme: light dark; }
+body { font: 16px/1.6 system-ui, sans-serif; margin: 0 auto; max-width: 42rem; padding: 1rem; }
+header { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: baseline; }
+header a { font-weight: 700; text-decoration: none; }
+a:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+main { margin-block: 2rem; }
+img { max-width: 100%; height: auto; }
+.card { border: 1px solid; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-block: 1rem; }
+.card-title { margin: 0; font-size: 1.2rem; }
+.meta { margin: 0.25rem 0 0; font-size: 0.9rem; opacity: 0.8; }
