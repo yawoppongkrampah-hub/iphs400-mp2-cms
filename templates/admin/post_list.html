@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-  <p><a href="/admin">Dashboard</a></p>
+  <p><a href="{{ route('dashboard') }}">Dashboard</a></p>
   <h1>Posts</h1>
-  {% if can(user.role, 'post.create') %}<p><a href="/admin/posts/new">Write a new Post</a></p>{% endif %}
+  {% if can(user.role, 'post.create') %}<p><a href="{{ route('new_post') }}">Write a new Post</a></p>{% endif %}
   {% if posts %}
   <ul>
     {% for post in posts %}
     <li>
-      <a href="/admin/posts/{{ post.id }}/edit">{{ post.title }}</a>
+      <a href="{{ route('edit_post', post_id=post.id) }}">{{ post.title }}</a>
       &middot; {{ post.status | capitalize }} &middot; {{ post.author_name }}
     </li>
     {% endfor %}

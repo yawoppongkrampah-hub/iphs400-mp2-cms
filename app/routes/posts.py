@@ -20,8 +20,8 @@ def _db(request: Request):
     return request.app.state.database
 
 
-def _edit_url(post_id: int) -> str:
-    return f"/admin/posts/{post_id}/edit"
+def _edit_url(request: Request, post_id: int) -> str:
+    return request.app.url_path_for("edit_post", post_id=post_id)
 
 
 def _found(request: Request, post_id: int):
@@ -56,7 +56,7 @@ def create_post(request: Request, title: str = Form(""), body: str = Form("")):
     except posts.PostError as error:
         return _form(request, status_code=400, error=str(error),
                      title_value=title, body_value=body)
-    return RedirectResponse(_edit_url(post_id), status_code=303)
+    return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
 @router.get("/{post_id}/edit", dependencies=[Depends(require("post.edit"))])
@@ -73,35 +73,35 @@ def save_post(request: Request, post_id: int, title: str = Form(""), body: str =
     except posts.PostError as error:
         return _form(request, post=post, status_code=400, error=str(error),
                      title_value=title, body_value=body)
-    return RedirectResponse(_edit_url(post_id), status_code=303)
+    return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
 @router.post("/{post_id}/publish", dependencies=[Depends(require("post.publish"))])
 def publish_post(request: Request, post_id: int):
     _found(request, post_id)
     posts.publish(_db(request), post_id)
-    return RedirectResponse(_edit_url(post_id), status_code=303)
+    return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
 @router.post("/{post_id}/unpublish", dependencies=[Depends(require("post.unpublish"))])
 def unpublish_post(request: Request, post_id: int):
     _found(request, post_id)
     posts.unpublish(_db(request), post_id)
-    return RedirectResponse(_edit_url(post_id), status_code=303)
+    return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
 @router.post("/{post_id}/delete", dependencies=[Depends(require("post.delete"))])
 def delete_post(request: Request, post_id: int):
     _found(request, post_id)
     posts.delete(_db(request), post_id)
-    return RedirectResponse("/admin/posts", status_code=303)
+    return RedirectResponse(request.app.url_path_for("post_list"), status_code=303)
 
 
 @router.get("/{post_id}/slug", dependencies=[Depends(require("post.change_slug"))])
 def slug_form(request: Request, post_id: int):
     # The slug form lives on the edit page, beside its warning.
     _found(request, post_id)
-    return RedirectResponse(_edit_url(post_id) + "#slug", status_code=303)
+    return RedirectResponse(_edit_url(request, post_id) + "#slug", status_code=303)
 
 
 @router.post("/{post_id}/slug", dependencies=[Depends(require("post.change_slug"))])
@@ -113,4 +113,4 @@ def change_slug(request: Request, post_id: int, slug: str = Form("")):
         code = 409 if isinstance(error, posts.SlugTaken) else 400
         return _form(request, post=post, status_code=code, slug_error=str(error),
                      title_value=post["title"], body_value=post["body"])
-    return RedirectResponse(_edit_url(post_id), status_code=303)
+    return RedirectResponse(_edit_url(request, post_id), status_code=303)

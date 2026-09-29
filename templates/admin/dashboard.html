@@ -2,8 +2,8 @@
 {% block content %}
   <h1>Dashboard</h1>
   <p>Dashboard placeholder: hello admin console, {{ user.display_name }}.</p>
-  <p><a href="/admin/posts">Posts</a></p>
-  <form method="post" action="/logout">
+  <p><a href="{{ route('post_list') }}">Posts</a></p>
+  <form method="post" action="{{ route('logout') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <button type="submit">Sign out</button>
   </form>

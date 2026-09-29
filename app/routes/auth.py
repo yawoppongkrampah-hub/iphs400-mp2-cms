@@ -16,7 +16,7 @@ GENERIC_FAILURE = "Incorrect username or password."
 @router.get("/login")
 def login_form(request: Request):
     if security.current_user(request):
-        return RedirectResponse("/admin", status_code=303)
+        return RedirectResponse(request.app.url_path_for("dashboard"), status_code=303)
     return render(request, "admin/login.html", title="Sign in")
 
 
@@ -27,10 +27,10 @@ def login(request: Request, username: str = Form(""), password: str = Form("")):
         return render(request, "admin/login.html", status_code=401,
                       title="Sign in", error=GENERIC_FAILURE)
     security.sign_in(request, user)
-    return RedirectResponse("/admin", status_code=303)
+    return RedirectResponse(request.app.url_path_for("dashboard"), status_code=303)
 
 
 @router.post("/logout")
 def logout(request: Request):
     security.sign_out(request)
-    return RedirectResponse("/login", status_code=303)
+    return RedirectResponse(request.app.url_path_for("login_form"), status_code=303)
