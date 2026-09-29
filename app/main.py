@@ -14,8 +14,9 @@ from fastapi import Depends, FastAPI, Request
 from starlette.middleware.sessions import SessionMiddleware
 
 from app import security, settings
-from app.routes import admin, auth
-from app.web import templates
+from app.permissions import PermissionRefused
+from app.routes import admin, auth, posts
+from app.web import render, templates
 
 SESSION_LIFETIME_SECONDS = 8 * 60 * 60
 
@@ -28,6 +29,12 @@ def create_app(database: Path | None = None) -> FastAPI:
 
     app.include_router(auth.router)
     app.include_router(admin.router)
+    app.include_router(posts.router)
+
+    @app.exception_handler(PermissionRefused)
+    def refuse(request: Request, _: PermissionRefused):
+        return render(request, "admin/refused.html", status_code=403,
+                      title="No permission", user=request.state.user)
 
     @app.get("/")
     def public_home(request: Request):

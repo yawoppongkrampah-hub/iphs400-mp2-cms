@@ -4,9 +4,11 @@ from __future__ import annotations
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from app import security, settings
+from app import permissions, security, settings
 
 templates = Jinja2Templates(directory=str(settings.TEMPLATES))
+# Templates use this only to hide controls; the server still checks every request.
+templates.env.globals["can"] = permissions.allowed
 
 
 def render(request: Request, name: str, status_code: int = 200, **context):
