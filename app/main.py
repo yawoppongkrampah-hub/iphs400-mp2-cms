@@ -1,30 +1,33 @@
 """The FastAPI application.
 
-T00 (already done): the admin console answers at /admin and the public site
-answers at /. That is the whole skeleton — it exists so you can prove the stack
-runs before you build anything on it.
+The admin console lives under /admin (signed-in only), with /login and /logout
+beside it; the public site preview answers at /.
 
 Add your routes in their own modules (app/routes/posts.py and so on) and include
 them here. Keep this file small.
 """
 from __future__ import annotations
 
-from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
+from pathlib import Path
 
-from app import settings
+from fastapi import Depends, FastAPI, Request
+from starlette.middleware.sessions import SessionMiddleware
 
-templates = Jinja2Templates(directory=str(settings.TEMPLATES))
+from app import security, settings
+from app.routes import admin, auth
+from app.web import templates
+
+SESSION_LIFETIME_SECONDS = 8 * 60 * 60
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(title="IPHS 400 MP2 CMS")
+def create_app(database: Path | None = None) -> FastAPI:
+    # Every state-changing request is CSRF-checked, whatever route it reaches.
+    app = FastAPI(title="IPHS 400 MP2 CMS",
+                  dependencies=[Depends(security.verify_csrf)])
+    app.state.database = database or settings.DATABASE_PATH
 
-    @app.get("/admin")
-    def admin_home(request: Request):
-        return templates.TemplateResponse(
-            request, "admin/hello.html", {"title": "Admin"}
-        )
+    app.include_router(auth.router)
+    app.include_router(admin.router)
 
     @app.get("/")
     def public_home(request: Request):
@@ -33,9 +36,13 @@ def create_app() -> FastAPI:
             {"title": settings.SITE_TITLE, "items": []},
         )
 
-    # Your ticket work plugs in here, e.g.
-    #   from app.routes import posts
-    #   app.include_router(posts.router)
+    # Middleware added last is outermost: the session must be loaded before the
+    # guard runs, and saved after it.
+    app.add_middleware(security.AdminGuard)
+    app.add_middleware(
+        SessionMiddleware, secret_key=settings.SECRET_KEY, session_cookie="cms_session",
+        max_age=SESSION_LIFETIME_SECONDS, same_site="lax",
+    )
     return app
 
 

@@ -1,5 +1,7 @@
-"""The `cms` command: serve, publish, deploy.
+"""The `cms` command: serve, publish, deploy, create-admin.
 
+    uv run cms create-admin --username NAME --display-name "ASA Leadership"
+                          # password is read from CMS_ADMIN_PASSWORD, never typed or printed
     uv run cms serve      # admin console + public preview at http://localhost:8000
     uv run cms publish    # render site/ from published content
     uv run cms deploy     # push site/ to the gh-pages branch (Pages serves it)
@@ -7,10 +9,11 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 
-from app import settings
+from app import accounts, settings
 from app.publish import render_site
 
 
@@ -20,6 +23,10 @@ def main(argv: list[str] | None = None) -> int:
     serve = sub.add_parser("serve", help="run the admin console locally")
     serve.add_argument("--port", type=int, default=8000)
     serve.add_argument("--reload", action="store_true", default=True)
+    admin = sub.add_parser("create-admin", help="create the first Admin account")
+    admin.add_argument("--username", required=True)
+    admin.add_argument("--display-name", required=True,
+                       help="the public byline, e.g. 'ASA Leadership'")
     sub.add_parser("publish", help="render site/ from published content")
     deploy = sub.add_parser("deploy", help="push site/ to gh-pages")
     deploy.add_argument("--message", default="Publish site")
@@ -29,6 +36,21 @@ def main(argv: list[str] | None = None) -> int:
         import uvicorn
 
         uvicorn.run("app.main:app", port=args.port, reload=args.reload)
+        return 0
+
+    if args.command == "create-admin":
+        password = os.environ.get("CMS_ADMIN_PASSWORD")
+        if not password:
+            print("Set CMS_ADMIN_PASSWORD in the environment (see .env.example).")
+            return 1
+        try:
+            accounts.create_account(
+                settings.DATABASE_PATH, username=args.username, password=password,
+                role="admin", display_name=args.display_name)
+        except accounts.AccountError as error:
+            print(error)
+            return 1
+        print(f"Created Admin account '{args.username}'.")
         return 0
 
     if args.command == "publish":

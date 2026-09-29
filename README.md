@@ -14,8 +14,14 @@ Do not fork: a fork arrives without an Issues tab, and your tickets live in Issu
 ```bash
 uv sync
 cp .env.example .env
-uv run cms serve        # then open http://localhost:8000/admin  -> "T00: hello admin"
+uv run --env-file .env python scripts/seed_demo.py   # demo accounts: admin, editor
+uv run --env-file .env cms serve    # then open http://localhost:8000/admin and sign in
 ```
+
+Sign in with the username `admin` (or `editor`) and the matching password from `.env`.
+To create your own first Admin instead: set `CMS_ADMIN_PASSWORD`, then
+`uv run --env-file .env cms create-admin --username NAME --display-name "ASA Leadership"`.
+The password is read from the environment and never printed.
 
 ## What is here
 
