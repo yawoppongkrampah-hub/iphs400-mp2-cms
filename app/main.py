@@ -15,6 +15,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app import security, settings
 from app.permissions import PermissionRefused
+from app.publish import WELCOME
 from app.routes import admin, auth, posts
 from app.web import render, templates
 
@@ -40,7 +41,8 @@ def create_app(database: Path | None = None) -> FastAPI:
     def public_home(request: Request):
         return templates.TemplateResponse(
             request, "public/home.html",
-            {"title": settings.SITE_TITLE, "items": []},
+            {"title": settings.SITE_TITLE, "site_title": settings.SITE_TITLE,
+             "root": "", "welcome": WELCOME, "posts": []},
         )
 
     # Middleware added last is outermost: the session must be loaded before the

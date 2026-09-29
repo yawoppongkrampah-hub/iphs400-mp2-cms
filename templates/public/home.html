@@ -1,9 +1,10 @@
-{% extends "base.html" %}
+{% extends "public/base.html" %}
 {% block content %}
-  <h1>{{ title }}</h1>
-  {% if items %}
-    <ul>{% for item in items %}<li><a href="{{ item.href }}">{{ item.title }}</a></li>{% endfor %}</ul>
-  {% else %}
-    <p>Nothing published yet.</p>
-  {% endif %}
+  <h1>{{ site_title }}</h1>
+  <p class="welcome">{{ welcome }}</p>
+  <h2 class="section">Latest announcements</h2>
+  {% for post in posts %}{% include "public/_card.html" %}{% else %}
+    <p>No announcements yet.</p>
+  {% endfor %}
+  {% if posts %}<p><a href="{{ root }}announcements.html">All announcements</a></p>{% endif %}
 {% endblock %}

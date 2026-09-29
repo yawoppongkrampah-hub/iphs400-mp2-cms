@@ -1,0 +1,14 @@
+{% extends "public/base.html" %}
+{% block title %}{{ post.title }} · {{ site_title }}{% endblock %}
+{% block content %}
+  <article>
+    <h1>{{ post.title }}</h1>
+    <p class="meta">
+      Posted <time datetime="{{ post.posted_iso }}">{{ post.posted_label }}</time>
+      by {{ post.author_name }}{% if post.updated_iso %}
+      · Updated <time datetime="{{ post.updated_iso }}">{{ post.updated_label }}</time>{% endif %}
+    </p>
+    <div class="body">{{ post.body_html | safe }}</div>
+  </article>
+  <p><a href="{{ root }}announcements.html">All announcements</a></p>
+{% endblock %}

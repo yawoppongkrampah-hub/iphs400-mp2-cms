@@ -54,3 +54,21 @@ def test_create_admin_refuses_a_taken_username(cli_db, monkeypatch, capsys):
     assert main(["create-admin", "--username", "boss", "--display-name", "X"]) == 0
     assert main(["create-admin", "--username", "BOSS", "--display-name", "Y"]) == 1
     assert "already exists" in capsys.readouterr().out
+
+
+def test_publish_command_writes_the_site_from_published_posts(
+        cli_db, tmp_path, monkeypatch, capsys):
+    from app import accounts, posts
+
+    accounts.seed_demo_accounts(cli_db, admin_password="test-admin-pw",
+                                editor_password="test-editor-pw")
+    live = posts.create(cli_db, title="Afrobeat Night", body="What: music", author_id=2)
+    posts.publish(cli_db, live)
+    posts.create(cli_db, title="Unfinished Idea", body="draft", author_id=2)
+    site = tmp_path / "site"
+    monkeypatch.setattr(settings, "SITE", site)
+
+    assert main(["publish"]) == 0
+    assert (site / "posts" / "afrobeat-night.html").exists()
+    assert not (site / "posts" / "unfinished-idea.html").exists()
+    assert "Wrote" in capsys.readouterr().out

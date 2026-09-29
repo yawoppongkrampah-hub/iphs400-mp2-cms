@@ -1,0 +1,7 @@
+{% extends "public/base.html" %}
+{% block content %}
+  <h1>Announcements</h1>
+  {% for post in posts %}{% include "public/_card.html" %}{% else %}
+    <p>No announcements yet.</p>
+  {% endfor %}
+{% endblock %}
