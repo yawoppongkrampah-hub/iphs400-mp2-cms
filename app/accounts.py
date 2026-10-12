@@ -25,7 +25,7 @@ _DUMMY_HASH = _hasher.hash("not-a-real-password")
 
 
 class AccountError(ValueError):
-    """A request to create an account that cannot be honoured."""
+    """A request about an account that cannot be honoured (shown to the Admin)."""
 
 
 class UsernameTaken(AccountError):
@@ -43,6 +43,12 @@ def _password_matches(stored_hash: str, password: str) -> bool:
         return False
 
 
+def _check_password_length(password: str) -> None:
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise AccountError(
+            f"The password must be at least {MIN_PASSWORD_LENGTH} characters.")
+
+
 def create_account(path: Path, *, username: str, password: str, role: str,
                    display_name: str) -> int:
     username, display_name = username.strip(), display_name.strip()
@@ -50,9 +56,7 @@ def create_account(path: Path, *, username: str, password: str, role: str,
         raise AccountError("A username and a Display name are required.")
     if role not in ROLES:
         raise AccountError(f"Role must be one of: {', '.join(ROLES)}.")
-    if len(password) < MIN_PASSWORD_LENGTH:
-        raise AccountError(
-            f"The password must be at least {MIN_PASSWORD_LENGTH} characters.")
+    _check_password_length(password)
     try:
         with closing(connect(path)) as conn, conn:
             cursor = conn.execute(
@@ -91,6 +95,80 @@ def set_active(path: Path, username: str, active: bool) -> None:
     with closing(connect(path)) as conn, conn:
         conn.execute("UPDATE users SET active = ? WHERE username = ?",
                      (int(active), username))
+
+
+class NoSuchAccount(AccountError):
+    pass
+
+
+class WouldLockOutAdmins(AccountError):
+    """The change would leave the console with no active Admin, or lock out the caller."""
+
+
+def list_accounts(path: Path) -> list[sqlite3.Row]:
+    with closing(connect(path)) as conn:
+        return conn.execute(
+            "SELECT * FROM users ORDER BY active DESC, display_name COLLATE NOCASE, id"
+        ).fetchall()
+
+
+def _found(conn: sqlite3.Connection, user_id: int) -> sqlite3.Row:
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    if user is None:
+        raise NoSuchAccount("No such account.")
+    return user
+
+
+def _other_active_admins(conn: sqlite3.Connection, user_id: int) -> int:
+    return conn.execute(
+        "SELECT COUNT(*) FROM users WHERE role = 'admin' AND active = 1 AND id != ?",
+        (user_id,)).fetchone()[0]
+
+
+def change_role(path: Path, user_id: int, role: str) -> None:
+    if role not in ROLES:
+        raise AccountError(f"Role must be one of: {', '.join(ROLES)}.")
+    with closing(connect(path)) as conn, conn:
+        user = _found(conn, user_id)
+        if (role != "admin" and user["role"] == "admin" and user["active"]
+                and not _other_active_admins(conn, user_id)):
+            raise WouldLockOutAdmins(
+                "This is the last active Admin. Make another account an Admin first.")
+        conn.execute("UPDATE users SET role = ? WHERE id = ?", (role, user_id))
+
+
+def deactivate(path: Path, user_id: int, *, acting_user_id: int) -> None:
+    """Deactivate an account (never delete it). An Admin cannot deactivate themself."""
+    with closing(connect(path)) as conn, conn:
+        _found(conn, user_id)
+        if user_id == acting_user_id:
+            raise WouldLockOutAdmins("You cannot deactivate your own account.")
+        conn.execute("UPDATE users SET active = 0 WHERE id = ?", (user_id,))
+
+
+def reactivate(path: Path, user_id: int) -> None:
+    with closing(connect(path)) as conn, conn:
+        _found(conn, user_id)
+        conn.execute("UPDATE users SET active = 1 WHERE id = ?", (user_id,))
+
+
+def change_display_name(path: Path, user_id: int, display_name: str) -> None:
+    display_name = display_name.strip()
+    if not display_name:
+        raise AccountError("A Display name is required.")
+    with closing(connect(path)) as conn, conn:
+        _found(conn, user_id)
+        conn.execute("UPDATE users SET display_name = ? WHERE id = ?",
+                     (display_name, user_id))
+
+
+def reset_password(path: Path, user_id: int, password: str) -> None:
+    """Replace an account's password hash. The old password is never readable."""
+    _check_password_length(password)
+    with closing(connect(path)) as conn, conn:
+        _found(conn, user_id)
+        conn.execute("UPDATE users SET password_hash = ? WHERE id = ?",
+                     (hash_password(password), user_id))
 
 
 def seed_demo_accounts(path: Path, *, admin_password: str,

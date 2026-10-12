@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+  <p><a href="{{ route('user_list') }}">All accounts</a></p>
+  <h1>{{ account.display_name }}</h1>
+  <dl>
+    <dt>Display name (public byline)</dt><dd><strong id="account-display-name">{{ account.display_name }}</strong></dd>
+    <dt>Username (private)</dt><dd><code id="account-username">{{ account.username }}</code></dd>
+    <dt>Role</dt><dd><strong id="account-role">{{ account.role | capitalize }}</strong></dd>
+    <dt>Status</dt><dd><strong id="account-status">{% if account.active %}Active{% else %}Deactivated{% endif %}</strong></dd>
+  </dl>
+
+  <h2>Display name</h2>
+  <p>Posts by this account show the new name after the next <code>cms publish</code>.</p>
+  {% if display_name_error %}<p role="alert">{{ display_name_error }}</p>{% endif %}
+  <form method="post" action="{{ route('change_display_name', user_id=account.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p><label>Display name <input name="display_name" value="{{ account.display_name }}" required></label></p>
+    <p><button type="submit">Change Display name</button></p>
+  </form>
+
+  <h2>Role</h2>
+  {% if role_error %}<p role="alert">{{ role_error }}</p>{% endif %}
+  <form method="post" action="{{ route('change_role', user_id=account.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p><label>Role
+      <select name="role">
+        {% for role in roles %}<option value="{{ role }}"{% if role == account.role %} selected{% endif %}>{{ role | capitalize }}</option>{% endfor %}
+      </select></label></p>
+    <p><button type="submit">Change role</button></p>
+  </form>
+
+  <h2>Password</h2>
+  <p>Set a new password for this account. The current one cannot be shown. Pass the new one to its owner outside the CMS.</p>
+  {% if password_error %}<p role="alert">{{ password_error }}</p>{% endif %}
+  <form method="post" action="{{ route('reset_password', user_id=account.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p><label>New password <input name="password" type="password" autocomplete="new-password" required></label></p>
+    <p><button type="submit">Set new password</button></p>
+  </form>
+
+  <h2>Access</h2>
+  {% if status_error %}<p role="alert">{{ status_error }}</p>{% endif %}
+  {% if account.active %}
+  <p>Deactivating stops this account from signing in. Its Posts stay Published.</p>
+  <form method="post" action="{{ route('deactivate_user', user_id=account.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Deactivate account</button>
+  </form>
+  {% else %}
+  <form method="post" action="{{ route('reactivate_user', user_id=account.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit">Reactivate account</button>
+  </form>
+  {% endif %}
+{% endblock %}

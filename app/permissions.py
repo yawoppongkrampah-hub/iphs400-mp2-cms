@@ -20,6 +20,14 @@ RULES: dict[str, frozenset[str]] = {
     "post.unpublish": EVERYONE,
     "post.delete": ADMIN_ONLY,
     "post.change_slug": ADMIN_ONLY,
+    "user.list": ADMIN_ONLY,
+    "user.view": ADMIN_ONLY,
+    "user.create": ADMIN_ONLY,
+    "user.change_role": ADMIN_ONLY,
+    "user.deactivate": ADMIN_ONLY,
+    "user.reactivate": ADMIN_ONLY,
+    "user.reset_password": ADMIN_ONLY,
+    "user.change_display_name": ADMIN_ONLY,
 }
 
 

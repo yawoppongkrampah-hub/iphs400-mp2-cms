@@ -94,7 +94,7 @@ A short, repeatable list of steps for making Published content Live. It also sta
 ## Roles
 
 **Admin**
-An ASA leader. Manages accounts and permanent Pages: creates and deletes Pages, publishes or unpublishes them, and changes Page titles or slugs (which affect navigation and links).
+An ASA leader. Manages accounts and permanent Pages: creates and deletes Pages, publishes or unpublishes them, and changes Page titles or slugs (which affect navigation and links). An Admin cannot deactivate their own account, and the last active Admin cannot be demoted, so the console is never left without someone able to manage accounts.
 
 **Editor**
 Another ASA member. Creates and publishes Posts directly, because speed matters for announcements. May edit any Post, including another editor's, so event details can be corrected close to the event. May not delete a Post; only the Admin can. May update the body of an existing Page, so the Photos page can stay current, but may not create, delete, publish, unpublish, retitle or re-slug a Page. This is a design choice for the ASA site, not something observed in WordPress.

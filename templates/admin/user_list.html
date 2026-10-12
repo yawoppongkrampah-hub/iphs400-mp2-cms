@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <p><a href="{{ route('dashboard') }}">Dashboard</a></p>
+  <h1>Accounts</h1>
+  <p><a href="{{ route('new_user') }}">Create an account</a></p>
+  <ul>
+    {% for account in accounts %}
+    <li>
+      <a href="{{ route('account_page', user_id=account.id) }}">{{ account.display_name }}</a>
+      &middot; {{ account.role | capitalize }}
+      &middot; {% if account.active %}Active{% else %}Deactivated{% endif %}
+      &middot; <small>signs in as {{ account.username }}</small>
+    </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+  <p><a href="{{ route('user_list') }}">All accounts</a></p>
+  <h1>Create an account</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="{{ route('create_user') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p><label>Username (private, used only to sign in)
+      <input name="username" value="{{ username_value }}" autocomplete="off" required></label></p>
+    <p><label>Password
+      <input name="password" type="password" autocomplete="new-password" required></label></p>
+    <p><label>Role
+      <select name="role">
+        {% for role in roles %}<option value="{{ role }}"{% if role == role_value %} selected{% endif %}>{{ role | capitalize }}</option>{% endfor %}
+      </select></label></p>
+    <p><label>Display name (public byline, e.g. "ASA Events Team")
+      <input name="display_name" value="{{ display_name_value }}" required></label></p>
+    <p><button type="submit">Create account</button></p>
+  </form>
+{% endblock %}

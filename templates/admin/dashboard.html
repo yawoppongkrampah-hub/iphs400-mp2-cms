@@ -3,6 +3,7 @@
   <h1>Dashboard</h1>
   <p>Dashboard placeholder: hello admin console, {{ user.display_name }}.</p>
   <p><a href="{{ route('post_list') }}">Posts</a></p>
+  {% if can(user.role, 'user.list') %}<p><a href="{{ route('user_list') }}">Accounts</a></p>{% endif %}
   <form method="post" action="{{ route('logout') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <button type="submit">Sign out</button>
