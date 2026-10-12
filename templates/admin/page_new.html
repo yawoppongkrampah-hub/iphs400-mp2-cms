@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <p><a href="{{ route('page_list') }}">All Pages</a></p>
+  <h1>New Page</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+
+  <form method="post" action="{{ route('create_page') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p><label>Title <input name="title" value="{{ title_value }}" required></label></p>
+    <p><label>Slug <input name="slug" value="{{ slug_value }}" required></label></p>
+    <p role="note">The slug is the Page's address, such as <code>about-asa</code>. Lowercase letters, numbers and hyphens only.</p>
+    <p><label>Body (Markdown)<br>
+      <textarea name="body" rows="14" cols="60">{{ body_value }}</textarea></label></p>
+    <p><button type="submit">Save as Draft</button></p>
+  </form>
+{% endblock %}

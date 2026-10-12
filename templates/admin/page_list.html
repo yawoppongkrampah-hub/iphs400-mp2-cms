@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+  <p><a href="{{ route('dashboard') }}">Dashboard</a></p>
+  <h1>Pages</h1>
+  {% if can(user.role, 'page.create') %}<p><a href="{{ route('new_page') }}">Create a new Page</a></p>{% endif %}
+  {% if pages %}
+  <ul>
+    {% for page in pages %}
+    <li>
+      <a href="{{ route('edit_page', page_id=page.id) }}">{{ page.title }}</a>
+      &middot; {{ page.status | capitalize }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No Pages yet.</p>
+  {% endif %}
+{% endblock %}

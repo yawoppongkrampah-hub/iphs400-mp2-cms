@@ -11,6 +11,8 @@
     <a class="site-name" href="{{ root }}index.html">{{ site_title }}</a>
     <nav aria-label="Main">
       <a href="{{ root }}announcements.html">Announcements</a>
+      {% for nav_page in nav_pages %}<a href="{{ root }}{{ nav_page.slug }}.html">{{ nav_page.title }}</a>
+      {% endfor %}
     </nav>
   </header>
   <main>{% block content %}{% endblock %}</main>

@@ -6,7 +6,7 @@
 Creates the demo Admin ("admin") and Editor ("editor") if they do not exist, with
 passwords from CMS_ADMIN_PASSWORD and CMS_EDITOR_PASSWORD. As you build content
 types, extend this so it also creates:
-  - a few posts and pages, at least one draft and one published
+  - a few posts and pages, at least one draft and one published (done: Posts and Pages)
 
 The rubric expects this to run clean on a fresh clone with .env.example values
 (item E4), because the database itself is never committed.
@@ -17,7 +17,7 @@ import os
 import sys
 from contextlib import closing
 
-from app import accounts, posts, settings
+from app import accounts, pages, posts, settings
 from app.db import connect
 
 
@@ -32,8 +32,10 @@ def main() -> int:
     accounts.seed_demo_accounts(
         settings.DATABASE_PATH, admin_password=admin_pw, editor_password=editor_pw)
     seed_demo_posts(settings.DATABASE_PATH)
+    seed_demo_pages(settings.DATABASE_PATH)
     print("Demo accounts ready: 'admin' and 'editor' (passwords from your environment). "
-          "Demo Posts ready: one Published, one Draft.")
+          "Demo Posts ready: one Published, one Draft. "
+          "Demo Pages ready: About ASA, Resources and Photos Published, one Draft.")
     return 0
 
 
@@ -59,6 +61,35 @@ def seed_demo_posts(path) -> None:
         post_id = posts.create(path, title=title, body=body, author_id=editor)
         if published:
             posts.publish(path, post_id)
+
+
+# Starter Pages: placeholders only, with no claim about ASA. Listed in Navigation order.
+DEMO_PAGES = [
+    ("About ASA", "about-asa", True,
+     "This is a **demo placeholder** Page, not ASA's real About page.\n\n"
+     "ASA's own description of itself will replace this text.\n"),
+    ("Resources", "resources", True,
+     "This is a **demo placeholder** Page, not a real list of ASA resources.\n\n"
+     "Cultural resources will be listed here.\n"),
+    ("Photos", "photos", True,
+     "This is a **demo placeholder** Page.\n\n"
+     "Actual event photos will be added when ASA has permission to use them.\n"),
+    ("Get involved (draft)", "get-involved", False,
+     "A draft Page that must never appear on the public site or in the Navigation.\n"),
+]
+
+
+def seed_demo_pages(path) -> None:
+    """Create the starter Pages once, created by the demo Admin."""
+    with closing(connect(path)) as conn:
+        if conn.execute("SELECT 1 FROM pages").fetchone():
+            return
+        admin = conn.execute(
+            "SELECT id FROM users WHERE username = 'admin'").fetchone()["id"]
+    for title, slug, published, body in DEMO_PAGES:
+        page_id = pages.create(path, title=title, slug=slug, body=body, author_id=admin)
+        if published:
+            pages.publish(path, page_id)
 
 
 if __name__ == "__main__":

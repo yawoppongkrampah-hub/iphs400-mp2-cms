@@ -17,7 +17,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from app import settings
+from app import pages, settings
 from app.db import connect
 from app.rendering import render_body
 
@@ -95,7 +95,10 @@ def render_site(out: Path | None = None, database: Path | None = None) -> Path:
     (out / "posts").mkdir(parents=True)
     env = environment()
     published = _published_posts(database)
-    common = {"site_title": settings.SITE_TITLE}
+    published_pages = pages.list_published(database)
+    # Every page of the site shows the same Navigation; the template prefixes `root`.
+    nav_pages = [{"title": page["title"], "slug": page["slug"]} for page in published_pages]
+    common = {"site_title": settings.SITE_TITLE, "nav_pages": nav_pages}
 
     def write(name: str, template: str, **context) -> None:
         (out / name).write_text(env.get_template(template).render(
@@ -109,4 +112,7 @@ def render_site(out: Path | None = None, database: Path | None = None) -> Path:
     for post in published:
         write(f"posts/{post['slug']}.html", "public/post.html", root="../", post=post,
               title=post["title"])
+    for page in published_pages:
+        write(f"{page['slug']}.html", "public/page.html", root="", title=page["title"],
+              page={"title": page["title"], "body_html": render_body(page["body"])})
     return out
