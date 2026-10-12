@@ -25,6 +25,14 @@ def route(context, name: str, **params) -> str:
 templates.env.globals["route"] = route
 
 
+def stamp(iso: str) -> str:
+    """A stored UTC time as "2026-10-12 04:24 UTC" (the minute is enough to tell edits apart)."""
+    return iso[:16].replace("T", " ") + " UTC"
+
+
+templates.env.filters["stamp"] = stamp
+
+
 def render(request: Request, name: str, status_code: int = 200, **context):
     """Render an admin template with the CSRF token every form needs."""
     context.setdefault("title", "Admin")

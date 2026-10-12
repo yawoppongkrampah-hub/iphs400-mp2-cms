@@ -13,6 +13,8 @@ EVERYONE = frozenset({ADMIN, EDITOR})
 ADMIN_ONLY = frozenset({ADMIN})
 
 RULES: dict[str, frozenset[str]] = {
+    "content.list": EVERYONE,
+    "dashboard.account_counts": ADMIN_ONLY,
     "post.list": EVERYONE,
     "post.create": EVERYONE,
     "post.edit": EVERYONE,

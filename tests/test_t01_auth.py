@@ -39,7 +39,7 @@ def test_correct_credentials_reach_the_dashboard(client, role):
     assert response.headers["location"] == "/admin"
     dashboard = client.get("/admin")
     assert dashboard.status_code == 200
-    assert "hello admin" in dashboard.text.lower()
+    assert "<h1>Dashboard</h1>" in dashboard.text
 
 
 def test_username_is_not_case_sensitive(client):
@@ -122,7 +122,7 @@ def test_any_admin_address_sends_a_signed_out_visitor_to_sign_in(client, path):
 
 def test_signed_out_redirect_shows_no_admin_content(client):
     response = client.get("/admin")  # follows the redirect to the sign-in page
-    assert "hello admin" not in response.text.lower()
+    assert "<h1>Dashboard</h1>" not in response.text
     assert 'name="password"' in response.text
 
 

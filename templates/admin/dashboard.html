@@ -1,7 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
   <h1>Dashboard</h1>
-  <p>Dashboard placeholder: hello admin console, {{ user.display_name }}.</p>
+  <p>Signed in as {{ user.display_name }}.</p>
+
+  <p class="notice" id="live-reminder">Marking content Published does not make it Live. It goes Live only after <code>cms publish</code> and <code>cms deploy</code> have run.</p>
+
+  <h2>Content</h2>
+  <ul class="stats">
+    <li><a href="{{ route('content_list') }}?type=post&amp;status=published"><span class="count" id="count-published-posts">{{ counts.published_posts }}</span> <span class="label">Published Posts</span></a></li>
+    <li><a href="{{ route('content_list') }}?type=post&amp;status=draft"><span class="count" id="count-draft-posts">{{ counts.draft_posts }}</span> <span class="label">Draft Posts</span></a></li>
+    <li><a href="{{ route('content_list') }}?type=page&amp;status=published"><span class="count" id="count-published-pages">{{ counts.published_pages }}</span> <span class="label">Published Pages</span></a></li>
+    <li><a href="{{ route('content_list') }}?type=page&amp;status=draft"><span class="count" id="count-draft-pages">{{ counts.draft_pages }}</span> <span class="label">Draft Pages</span></a></li>
+  </ul>
+
+  {% if account_counts and can(user.role, 'dashboard.account_counts') %}
+  <h2>Accounts</h2>
+  <ul class="stats">
+    <li><a href="{{ route('user_list') }}"><span class="count" id="count-active-accounts">{{ account_counts.active }}</span> <span class="label">Active accounts</span></a></li>
+    <li><a href="{{ route('user_list') }}"><span class="count" id="count-deactivated-accounts">{{ account_counts.deactivated }}</span> <span class="label">Deactivated accounts</span></a></li>
+  </ul>
+  {% endif %}
+
+  <p><a href="{{ route('content_list') }}">All content</a></p>
   <p><a href="{{ route('post_list') }}">Posts</a></p>
   <p><a href="{{ route('page_list') }}">Pages</a></p>
   {% if can(user.role, 'user.list') %}<p><a href="{{ route('user_list') }}">Accounts</a></p>{% endif %}

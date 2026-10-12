@@ -112,6 +112,13 @@ def list_accounts(path: Path) -> list[sqlite3.Row]:
         ).fetchall()
 
 
+def count_by_status(path: Path) -> dict[str, int]:
+    """Active and Deactivated account counts. For the Admin's Dashboard only."""
+    with closing(connect(path)) as conn:
+        by_flag = dict(conn.execute("SELECT active, COUNT(*) FROM users GROUP BY active"))
+    return {"active": by_flag.get(1, 0), "deactivated": by_flag.get(0, 0)}
+
+
 def _found(conn: sqlite3.Connection, user_id: int) -> sqlite3.Row:
     user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
     if user is None:

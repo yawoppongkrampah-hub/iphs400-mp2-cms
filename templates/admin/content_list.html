@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% macro link(label, k, s, current) -%}
+  <a href="{{ route('content_list') }}{% if k and s %}?type={{ k }}&amp;status={{ s }}{% elif k %}?type={{ k }}{% elif s %}?status={{ s }}{% endif %}"{% if current %} aria-current="true"{% endif %}>{{ label }}</a>
+{%- endmacro %}
+{% block content %}
+  <p><a href="{{ route('dashboard') }}">Dashboard</a></p>
+  <h1>Content</h1>
+
+  <div class="filters">
+    <nav aria-label="Filter by type">
+      <ul>
+        <li>{{ link('All types', None, status, kind is none) }}</li>
+        <li>{{ link('Posts', 'post', status, kind == 'post') }}</li>
+        <li>{{ link('Pages', 'page', status, kind == 'page') }}</li>
+      </ul>
+    </nav>
+    <nav aria-label="Filter by status">
+      <ul>
+        <li>{{ link('Any status', kind, None, status is none) }}</li>
+        <li>{{ link('Draft', kind, 'draft', status == 'draft') }}</li>
+        <li>{{ link('Published', kind, 'published', status == 'published') }}</li>
+      </ul>
+    </nav>
+  </div>
+
+  {% if items %}
+  <ul class="content-rows">
+    {% for item in items %}
+    <li class="content-row">
+      <a class="row-title" href="{% if item.kind == 'post' %}{{ route('edit_post', post_id=item.id) }}{% else %}{{ route('edit_page', page_id=item.id) }}{% endif %}">{{ item.title }}</a>
+      <div class="row-meta">
+        <span class="row-type">{{ item.kind | capitalize }}</span>
+        <span class="row-status">{{ item.status | capitalize }}</span>
+        <span class="row-author">{{ item.author_name or '—' }}</span>
+        <time class="row-updated" datetime="{{ item.updated_at }}">{{ item.updated_at | stamp }}</time>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Nothing matches these filters.</p>
+  {% endif %}
+{% endblock %}
