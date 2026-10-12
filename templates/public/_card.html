@@ -1,5 +1,5 @@
 <article class="card">
-  <h2 class="card-title"><a href="{{ root }}posts/{{ post.slug }}.html">{{ post.title }}</a></h2>
+  <h{{ card_level|default(2) }} class="card-title"><a href="{{ root }}posts/{{ post.slug }}.html">{{ post.title }}</a></h{{ card_level|default(2) }}>
   <p class="meta">
     Posted <time datetime="{{ post.posted_iso }}">{{ post.posted_label }}</time>
     by {{ post.author_name }}{% if post.updated_iso %}

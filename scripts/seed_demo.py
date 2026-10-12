@@ -73,7 +73,17 @@ DEMO_PAGES = [
      "Cultural resources will be listed here.\n"),
     ("Photos", "photos", True,
      "This is a **demo placeholder** Page.\n\n"
-     "Actual event photos will be added when ASA has permission to use them.\n"),
+     "Actual event photos will be added when ASA has permission to use them.\n\n"
+     "## Illustrative placeholders\n\n"
+     "![Illustration: three overlapping circles in red, gold and green]"
+     "(images/demo-illustration-1.svg)\n\n"
+     "*Illustrative placeholder, not a photo of a real ASA event.*\n\n"
+     "![Illustration: wavy red, gold and cream lines on a green background]"
+     "(images/demo-illustration-2.svg)\n\n"
+     "*Illustrative placeholder, not a photo of a real ASA event.*\n\n"
+     "![Illustration: a row of diamond shapes on a dark background]"
+     "(images/demo-illustration-3.svg)\n\n"
+     "*Illustrative placeholder, not a photo of a real ASA event.*\n"),
     ("Get involved (draft)", "get-involved", False,
      "A draft Page that must never appear on the public site or in the Navigation.\n"),
 ]

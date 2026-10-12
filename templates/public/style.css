@@ -1,0 +1,150 @@
+/* Public site styles. Mobile-first; readable at about 390px. No external files.
+   Every text/background pair below is checked for contrast by tests/test_t07_public_site.py. */
+:root {
+  color-scheme: light;
+  --bg: #fbf7f0;
+  --surface: #ffffff;
+  --text: #1f1a14;
+  --muted: #5b5247;
+  --link: #8a2d0f;
+  --accent: #8a2d0f;
+  --on-accent: #ffffff;
+  --focus: #0b57d0;
+  --line: #d9cfc0;
+  --band-1: #8a2d0f;
+  --band-2: #c8941f;
+  --band-3: #2f6b3f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #17130f;
+    --surface: #231d17;
+    --text: #f3ece2;
+    --muted: #c4b8a8;
+    --link: #f2a07b;
+    --accent: #f2a07b;
+    --on-accent: #17130f;
+    --focus: #8ab4f8;
+    --line: #4a3f33;
+    --band-1: #f2a07b;
+    --band-2: #e0b54a;
+    --band-3: #6fb583;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 1.0625rem/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow-wrap: anywhere;
+}
+
+img { max-width: 100%; height: auto; }
+
+a { color: var(--link); text-underline-offset: 0.15em; }
+a:hover { text-decoration-thickness: 0.15em; }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+.skip-link:focus { top: 0.5rem; }
+
+/* Header: a decorative colour band, the site name, then the Navigation. */
+.site-header { border-top: 0.5rem solid var(--band-1); border-image: linear-gradient(
+  to right, var(--band-1) 0 33%, var(--band-2) 33% 66%, var(--band-3) 66% 100%) 1; }
+.site-header-inner { max-width: 44rem; margin: 0 auto; padding: 0.75rem 1rem 0; }
+.site-name {
+  display: inline-block;
+  padding: 0.4rem 0;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.site-header nav { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; margin: 0 -0.5rem; }
+.site-header nav a {
+  display: inline-block;
+  padding: 0.6rem 0.75rem;          /* a comfortable touch target */
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+.site-header nav a:hover { border-bottom-color: var(--line); }
+.site-header nav a[aria-current="page"] { color: var(--link); border-bottom-color: var(--accent); }
+
+main { max-width: 44rem; margin: 0 auto; padding: 1.5rem 1rem 2.5rem; }
+
+h1 { margin: 0 0 0.75rem; font-size: 1.9rem; line-height: 1.2; }
+h2 { margin: 2rem 0 0.75rem; font-size: 1.45rem; line-height: 1.25; }
+h3 { margin: 1.5rem 0 0.5rem; font-size: 1.2rem; line-height: 1.3; }
+h4, h5, h6 { margin: 1.25rem 0 0.5rem; font-size: 1.05rem; }
+
+.hero {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 0.5rem solid var(--accent);
+  border-radius: 0.5rem;
+}
+.welcome { margin: 0; font-size: 1.15rem; }
+
+.cards { margin-block: 1rem; }
+.card {
+  margin-block: 1rem;
+  padding: 1rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+}
+.card-title { margin: 0; font-size: 1.25rem; line-height: 1.3; }
+.card-title a { color: var(--text); text-decoration-color: var(--accent); }
+.card-title a:hover { color: var(--link); }
+.meta { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.95rem; }
+
+.more {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.7rem 1.1rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0.4rem;
+}
+.more:hover { text-decoration: underline; }
+
+.body > :first-child { margin-top: 0; }
+.body img { display: block; margin-block: 1rem 0.25rem; border-radius: 0.4rem; }
+.body em { color: var(--muted); }
+.body ul, .body ol { padding-left: 1.4rem; }
+
+.back { margin-top: 2rem; }
+
+footer { max-width: 44rem; margin: 0 auto; padding: 1rem 1rem 2rem; color: var(--muted); border-top: 1px solid var(--line); }
+
+@media (min-width: 40rem) {
+  h1 { font-size: 2.3rem; }
+  .hero { padding: 1.75rem 2rem 2rem; }
+}

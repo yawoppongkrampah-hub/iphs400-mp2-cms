@@ -28,19 +28,8 @@ WELCOME = (
     "cultures and community."
 )
 HOME_ANNOUNCEMENTS = 5
-
-CSS = """/* Minimal starter styles — make them yours. */
-:root { color-scheme: light dark; }
-body { font: 16px/1.6 system-ui, sans-serif; margin: 0 auto; max-width: 42rem; padding: 1rem; }
-header { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: baseline; }
-header a { font-weight: 700; text-decoration: none; }
-a:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
-main { margin-block: 2rem; }
-img { max-width: 100%; height: auto; }
-.card { border: 1px solid; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-block: 1rem; }
-.card-title { margin: 0; font-size: 1.2rem; }
-.meta { margin: 0.25rem 0 0; font-size: 0.9rem; opacity: 0.8; }
-"""
+# Approved image files the release-holder may add to images/. Anything else is ignored.
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 
 
 def environment() -> Environment:
@@ -78,7 +67,7 @@ def _post_for_template(row: sqlite3.Row) -> dict:
     posted_iso, posted_label = _day(row["first_published_at"])
     post = {
         "title": row["title"], "slug": row["slug"], "author_name": row["author_name"],
-        "body_html": render_body(row["body"]),
+        "body_html": render_body(row["body"], root="../"),
         "posted_iso": posted_iso, "posted_label": posted_label,
         "updated_iso": None, "updated_label": None,
     }
@@ -87,9 +76,28 @@ def _post_for_template(row: sqlite3.Row) -> dict:
     return post
 
 
-def render_site(out: Path | None = None, database: Path | None = None) -> Path:
+def copy_images(source: Path, out: Path) -> None:
+    """Copy the release-holder's approved image files to <site>/images/.
+
+    Only image files are copied (by extension), and never hidden ones, so a stray
+    `.env` or script dropped in the folder cannot reach the public site.
+    """
+    if not source.is_dir():
+        return
+    for path in sorted(source.rglob("*")):
+        relative = path.relative_to(source)
+        if (path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
+                and not any(part.startswith(".") for part in relative.parts)):
+            target = out / "images" / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, target)
+
+
+def render_site(out: Path | None = None, database: Path | None = None,
+                images: Path | None = None) -> Path:
     out = out or settings.SITE
     database = database or settings.DATABASE_PATH
+    images = images or settings.IMAGES
     if out.exists():
         shutil.rmtree(out)
     (out / "posts").mkdir(parents=True)
@@ -104,15 +112,18 @@ def render_site(out: Path | None = None, database: Path | None = None) -> Path:
         (out / name).write_text(env.get_template(template).render(
             **common, **context))
 
-    (out / "style.css").write_text(CSS)
+    (out / "style.css").write_text((settings.TEMPLATES / "public" / "style.css").read_text())
+    copy_images(images, out)
     write("index.html", "public/home.html", title=settings.SITE_TITLE, root="",
-          welcome=WELCOME, posts=published[:HOME_ANNOUNCEMENTS])
+          welcome=WELCOME, posts=published[:HOME_ANNOUNCEMENTS], card_level=3)
     write("announcements.html", "public/announcements.html",
-          title=f"Announcements · {settings.SITE_TITLE}", root="", posts=published)
+          title=f"Announcements · {settings.SITE_TITLE}", root="", posts=published,
+          current="announcements")
     for post in published:
         write(f"posts/{post['slug']}.html", "public/post.html", root="../", post=post,
-              title=post["title"])
+              title=post["title"], current="announcements")
     for page in published_pages:
         write(f"{page['slug']}.html", "public/page.html", root="", title=page["title"],
+              current=page["slug"],
               page={"title": page["title"], "body_html": render_body(page["body"])})
     return out

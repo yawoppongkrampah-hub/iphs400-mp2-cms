@@ -7,6 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = ROOT / "templates"
 SITE = ROOT / "site"
+# Approved image files, added by the release-holder; `cms publish` copies them.
+IMAGES = ROOT / "images"
 
 SECRET_KEY = os.environ.get("CMS_SECRET_KEY", "dev-only-not-for-production")
 DATABASE_PATH = Path(os.environ.get("CMS_DATABASE", ROOT / "cms.db"))

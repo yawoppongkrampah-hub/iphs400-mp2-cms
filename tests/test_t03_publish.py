@@ -46,7 +46,7 @@ def read(out, name):
 
 def titles_in_order(html):
     """The Event card titles in the order they appear on the page."""
-    return re.findall(r'<h2 class="card-title"><a [^>]*>([^<]+)</a>', html)
+    return re.findall(r'<h[23] class="card-title"><a [^>]*>([^<]+)</a>', html)
 
 
 def publish(db_path, tmp_path):

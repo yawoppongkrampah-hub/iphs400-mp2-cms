@@ -1,10 +1,14 @@
 {% extends "public/base.html" %}
 {% block content %}
-  <h1>{{ site_title }}</h1>
-  <p class="welcome">{{ welcome }}</p>
-  <h2 class="section">Latest announcements</h2>
-  {% for post in posts %}{% include "public/_card.html" %}{% else %}
-    <p>No announcements yet.</p>
-  {% endfor %}
-  {% if posts %}<p><a href="{{ root }}announcements.html">All announcements</a></p>{% endif %}
+  <section class="hero">
+    <h1>{{ site_title }}</h1>
+    <p class="welcome">{{ welcome }}</p>
+  </section>
+  <section class="cards" aria-labelledby="latest">
+    <h2 id="latest">Latest announcements</h2>
+    {% for post in posts %}{% include "public/_card.html" %}{% else %}
+      <p>No announcements yet.</p>
+    {% endfor %}
+    {% if posts %}<a class="more" href="{{ root }}announcements.html">All announcements</a>{% endif %}
+  </section>
 {% endblock %}

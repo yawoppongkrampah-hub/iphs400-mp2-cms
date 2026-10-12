@@ -28,6 +28,7 @@ The password is read from the environment and never printed.
 ```text
 .claude/hooks/     the context meter and usage ledger (Exercise A lives in ctx_guard.py)
 scripts/           usage_report.py (Exercise B lives in spend()), check_submission.py, seed_demo.py
+images/            approved image files the release-holder adds; `cms publish` copies them
 tests/             the exercise tests, plus helpers such as client_as("editor")
 app/, templates/   the T00 skeleton — every CMS feature is yours to build
 docs/adr/          two example decision records
