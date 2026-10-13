@@ -1,6 +1,6 @@
-# MP2 self-assessment, version 2.3 (rubric `mp2-v1-20260922`)
+# MP2 self-assessment, version 2.5 (rubric `mp2-v1-20260922`)
 
-Re-run on 2026-10-13 after the T09 repairs (#11), their review follow-up, and the T10 checks (#12). The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
+Re-run on 2026-10-13 after the T09 repairs (#11), their review follow-up, the T10 checks (#12), and the final report wording. The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
 
 | Ref | Commit |
 |---|---|
@@ -34,14 +34,14 @@ Done after the Spec review finished and before the follow-up commit:
 | B Workflow | 17 | 16 | 16 |
 | C Functionality | 15 | **15 only if the grader passes `--env-file`; about 0 if it uses the rubric's literal commands** | 15 |
 | D Security | 8 | 8 | 8 |
-| E Tests and code | 8 | 7 (E4 is part of the same setup risk) | 7 |
+| E Tests and code | 8 | 7 (E4 is part of the same setup risk) | 8 |
 | F Site and admin UX | 7 | 4 | 7 |
 | G Docs | 6 | 5 | 5 |
 | H Compliance | 7 | 5 | 5 |
-| Stage 2 | 85 | 74 (or about 58 on the literal-commands reading) | 77 |
-| **Total** | 100 | **89** (or about 73) | **92** |
+| Stage 2 | 85 | 74 (or about 58 on the literal-commands reading) | 78 |
+| **Total** | 100 | **89** (or about 73) | **93** |
 
-Why the tag column moved from 85 to 89 without any code change: issue #10's missing "Blocked by" line was recorded (S1.5 +1, B2 +1), and A3 was rescored from 2 to 4 after the recheck below. Issues are read live from GitHub, so that applies to the tag too. Everything that needed code or the new report lives only on `main`.
+Why the tag column moved from 85 to 89 without any code change: issue #10's missing "Blocked by" line was recorded (S1.5 +1, B2 +1), and A3 was rescored from 2 to 4 after the recheck below. Issues are read live from GitHub, so that applies to the tag too. Everything that needed code or the new report lives only on `main`, including the `cms deploy` and Backends tests that lift E2 on `main` (on the tag, E2 stays 1).
 
 Separate from the score: **the submission is late** (see "Deadline compliance"). The extra points above do not change that.
 
@@ -91,7 +91,7 @@ So the numbers are the same either way; the follow-up changes how the evidence r
 | B3 | 3 | 3 | All closing commits touch at least 3 of 4 layers | none |
 | B4 | 3 | 3 (integrity caveat) | By timestamp 9 of 9; #10 was written after the work | Disclosed in #10, the report and this document |
 | B5 | 3 | 3 | Review comment before close on every closed ticket | none |
-| B6 | 2 | 2 | Hook tests pass (18); `compaction-log.md` exists with 0 entries; every implement session starts fresh per transcripts; 1 handoff | none |
+| B6 | 2 | 2 | (a) Hook tests pass (18); `docs/process/compaction-log.md` exists. It now holds **1 auto compaction** (this long session, `a77ef331`, 2026-10-13 05:17 UTC), written by the hook, which is the rubric's limit ("<=1"), so there is no margin left. (b) **8 of 8 sessions that invoked `/implement` began fresh** (after `/clear`, or with the command as the first input), per the committed transcripts: sessions 07 (#2), 09 (#3), 18 (#4), 13 (#5), 14 (#6), 15 (#7), 17 (#8), and 16 (#7 again, which implemented nothing because #7 was already done). Session 09 also received `implement #4`, and declined it under the one-ticket-per-session rule; T03 was built in fresh session 18. 1 auto compaction in the log (at the limit); 2 handoffs saved | Do not let another session auto-compact: a second entry would cost B6(b). Do the remaining steps in fresh sessions |
 | B7 | 3 | 2 | (a) plan committed before the first `/implement` commit: 1. (c) report now uses a dated ledger snapshot (2026-10-13 02:37Z, 90 rows, last 02:30Z) and matches `usage_report.py --remaining 0`: 1. **(b) the ledger covers 15 of 19 transcript sessions (79%): 0** | (b) not achievable honestly: sessions 04, 10, 11, 12 have no ledger rows. The report now says so; I did not add rows |
 
 ### C. Functionality (15): 15 on `main`
@@ -117,7 +117,7 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
 | E1 | 3 | 3 | Fresh clone of `origin/main`: 409 passed at the last verified clone; 447 pass in the working tree after T10 (includes the Chrome-based test) | none |
-| E2 | 2 | 1 (conditional) | T03's criterion 7 (`cms deploy`) and T08's Backends table are now covered by behaviour tests. What is left uncovered is T08's checklist statements that are not behaviour: that Photo permission is confirmed by a leader, and that the checklist says the author runs it and claims no ASA owner or approval process. I have not added a wording test for them. See the recheck section | See recheck section |
+| E2 | 2 | 2 on `main` (medium); 1 at the tag | Read at the rubric's own grain (each acceptance *criterion* needs at least one test that names or clearly exercises it), every testable criterion of all nine tickets now has one on `main`. The two gaps named earlier are closed by #12: T03 criterion 7 by `tests/test_t10_deploy.py`, T08's Backends table by `scripts/check_backends.py` and `tests/test_t10_backends.py`. See the recheck section | Residual risk only, see the recheck section |
 | E3 | 2 | 2 | Largest file 498 lines (`tests/test_t04_users.py`); split by concern; no commented-out blocks. The new files are smaller | none |
 | E4 | 1 | 1 | `tests/test_t09_setup.py` runs the rubric's commands in a clean copy | none |
 
@@ -134,7 +134,7 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
-| G1 | 3 | 2 | All four questions are answered. The 3 tier also needs "claims verifiable in the repo", and (c) "used and why" is thin: it says what was used but gives a reason only for ChatGPT, and cites no prompt. A few claims cannot be checked in the repo today (see the recheck section) | See recheck section |
+| G1 | 3 | 2 | All four questions are answered, and (c) is not thin: it says why the grill, small tickets, test-first development and independent review were used, and ties them to the two real README prompts. What is left is the "claims verifiable in the repo" part of the 3 tier: the ChatGPT use (rests on your account), and the fresh-session claim for T08, whose transcript is written when this session ends. The report now says exactly that: the committed transcripts show T01 to T07 began fresh, T08 is not saved yet, and the design follow-up and repairs continued in existing sessions | See recheck section |
 | G2 | 2 | 2 | Live URL, Run locally steps (now simpler and verified on a fresh clone), AI Use Statement with the Backends table | none |
 | G3 | 1 | 1 | 12 screenshots, retaken without cropping; a test checks their pixel widths | none |
 
@@ -157,19 +157,18 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 - **Moving `mp2-final` to `main` would make it later again.** It would not change H5 (already 0) but it replaces the tag's push time with a new, later one.
 - There is no evidence of an approved extension, and I have not assumed one. Lateness is routed to the instructor by the rubric.
 
-## Remaining deductions (`main`: 92, so 8 points)
+## Remaining deductions (`main`: 93, so 7 points)
 
 | Item | Lost | Achievable? | What would earn it |
 |---|---|---|---|
 | A2 | 1 | Partly | Field notes that name the client and use its vocabulary: a dated addendum, since the original is from 2026-09-28 |
 | A5 | 2 | Yes, only you | Three comments in your own words, dated truthfully |
 | B7(b) | 1 | **No** | The ledger has no data for four sessions |
-| E2 | 1 | Only by a wording test I declined, or luck in sampling | T08's checklist statements (Photo permission, who runs it, no ASA owner claimed) are the only criteria left without a test |
-| G1 | 1 | Largely | A fuller answer to (c); the T08 transcript committed when the session ends |
+| G1 | 1 | Largely | The T08 transcript committed when the session ends. The ChatGPT use stays an attestation |
 | H4 | 1 | Yes, only you | Send the email |
 | H5 | 1 | **No** | Lateness; the instructor decides |
 
-Realistic ceiling: 92 now, up to about 98 if A5, A2, E2, G1 and H4 all land (A5 +2, the others +1 each); E2 depends on whether you accept a wording test.
+Realistic ceiling: 93 now, up to 98 if A5, A2, G1 and H4 all land (A5 +2, the others +1 each). B7(b) and H5 cannot be earned.
 
 ## Recheck of A2, A3, E2 and G1 against the rubric's exact wording
 
@@ -203,39 +202,60 @@ My earlier score of 2 rested on "the report was drafted mostly by the assistant"
 
 **Residual risk, not a deduction:** the `.env.example` paragraph is written about Claude Code in the third person ("Claude Code found..."), so a judge could read that specific as less "only you". The T07b and invented-claim specifics still make two.
 
-### E2: tests trace to acceptance criteria (2): 1, now at lower risk
+### E2: tests trace to acceptance criteria (2): 2 on `main`, 1 at the tag
 
 *Wording:* "Judge samples 3 tickets; each acceptance criterion has >=1 test that names or clearly exercises it (2 = all, 1 = >=half)."
 
-I read every criterion of all nine tickets (#2 to #10). Criteria that no test can exercise (T02 AC10 "the tests are read before they pass"; T07b's single criterion, a review comment) are set aside, since nothing could test them.
+**A correction to my earlier reading.** Version 2.3 kept E2 at 1 because a few *clauses inside* T08's release-checklist criterion had no test (Photo permission confirmed by a leader; the checklist says the author runs it; no ASA owner or approval process is claimed). The rubric's unit is the **criterion**, and it asks for at least one test that names or clearly exercises it. It does not ask for a test of every clause. I was holding the item to a stricter standard than its wording, so I withdraw that deduction.
 
-| Ticket | Testable criterion that had no test | Status now |
-|---|---|---|
-| T03 (#4) AC7 | "`cms deploy` pushes the export to the GitHub Pages branch. The live URL shows a Published demo Post and does not show a Draft." | **Covered** by `tests/test_t10_deploy.py` (local bare repository; Draft absent on first and second deploy). The live URL part was checked by hand and is not a unit test |
-| T08 (#9) | "The README has ... the Backends used table." | **Covered** by `scripts/check_backends.py` and `tests/test_t10_backends.py` |
-| T08 (#9), partly | The release checklist's steps | `cms publish` and `cms deploy` (tests), the relative-path check and the Editor limit (behaviour tests), adding approved images (copy test) are covered. **Not covered:** confirming Photo permission (a human step), and the statements that the author runs the release and that no ASA owner or approval process is claimed (wording) |
-| T01 (#2) AC9 | "`.env.example` lists every variable needed" | Covered by the clean-copy setup tests |
-| T07 (#8) AC6 | contrast, focus, keyboard | Covered |
+I re-read every criterion of all nine tickets (#2 to #10). Against the two tests added in #12:
 
-**Unmet requirement:** only T08's checklist statements remain, and they are statements, not behaviour. I am not adding a test that greps the checklist's wording: it would prove the sentence exists, not that anything works. So I keep the point at 1, because a strict judge would call "each criterion" unmet if T08 is sampled. The sampling risk fell from about 58% (T03 or T08 among 3 of 9) to about 33% (T08 alone). If you want the point, the choice is yours: either accept the wording test, or accept the risk.
+| Criterion | Test that names or exercises it |
+|---|---|
+| T03 (#4) criterion 7, "`cms deploy` pushes the export to the GitHub Pages branch ... does not show a Draft" | `tests/test_t10_deploy.py` (6 tests): real `cms publish` then `cms deploy` into a temporary local bare repository; every exported file reaches `gh-pages` byte for byte, no `main` is pushed, a Draft is absent on the first and the second deploy, an unpublished Post disappears, a missing `site/` is refused, and git itself refuses an https remote. The "live URL" half of the sentence was checked by hand against the live site |
+| T08 (#9) "The README has Live URL, Run locally and Generative AI Use Statement sections, with the Backends used table" | Live URL, Run locally and the statement: `check_submission.py`; the setup steps themselves: `tests/test_t09_setup.py`; the Backends table: `tests/test_t10_backends.py::test_the_real_readme_ledger_and_history_agree` and the command test, with 14 negative controls |
+| T08 (#9) the release checklist | Named by `tests/test_t08_release.py::test_the_checklists_relative_path_check_is_quiet_on_a_real_export_and_catches_a_bad_one`; also exercised by the publish test (`test_cms_cli.py`), the deploy tests, the approved-image copy tests (`test_t07_public_site.py`) and `test_no_screen_or_route_accepts_a_file_so_an_editor_cannot_add_an_image` |
+| T08 (#9) the Preview, the hint, the seed, the clean-clone smoke test, the screenshots | `test_t08_preview.py` (23), `test_t08_release.py`, `test_t09_setup.py`, `test_t09_mobile.py` (screenshot pixel widths) and `check_submission.py` (names) |
+| T01 (#2) AC9 ".env.example lists every variable needed"; T07 (#8) contrast, focus, keyboard | `test_t09_setup.py`; `test_t07_public_site.py` |
 
-### G1: report answers the four questions (3): 2 stands
+**What is not covered by a test, and why I set it aside.** Two criteria are process steps that no test can exercise: T02 (#3) AC10, "the tests are read before they are allowed to pass", and T07b (#10)'s single criterion, a review comment posted before closing. Also, "the Stage 2 submission checker passes" (T08) and "the Stage 1 checker passes" (T03) are exercised by running the checker itself, which is an existing submission check, not a pytest test.
+
+**Residual risk, not a deduction:** a strict judge could count those process and checker criteria as untested. I put that at low, so E2 is 2 with medium confidence.
+
+**At the tag:** `mp2-final` does not contain the deploy or Backends tests, so T03 criterion 7 and T08's Backends table have no test there, and E2 stays 1 at the tag. That is part of the case for moving the tag.
+
+### G1: report answers the four questions (3): 2 stands, for a different reason now
 
 *Wording:* "(a) what you built and which grill decisions were yours; (b) one place the AI drifted or made something up, and how the workflow caught it; (c) skills, prompts, and resources used and why; (d) future improvements. 3 = all four, claims verifiable in the repo; 2 = all four with one unverifiable claim or one thin answer; 1 = one question missing."
 
 | Question | Met? | Evidence |
 |---|---|---|
-| (a) built, and your grill decisions | Yes | Section 1; the decisions match your session 03 answers |
-| (b) AI drift and how it was caught | Yes | The quoted claim, caught "while reviewing issue #1"; the `.env.example` defect, which a hand-parsing test missed and `uv` exposed. This meets the rubric's own anchor: it names the item, quotes the claim, and names the catching step |
-| **(c) skills, prompts, resources, and why** | **Thin** | Section 3 lists Claude Code, the two models, the course manual and rubric and the plugin, and gives a purpose only for ChatGPT. It does not say why those skills or that order, and it cites no prompt (the two real prompts are in the README) |
-| (d) future improvements | Yes | Event-date field; stronger session invalidation, with the reason it was accepted |
+| (a) built, and your grill decisions | Yes | Section 1 lists the decisions, which match your session 03 answers; the later repairs are named as #11 and #12 |
+| (b) AI drift and how it was caught | Yes | The quoted invented claim, caught while reviewing issue #1; the `.env.example` defect, which a hand-parsing test missed and `uv` exposed |
+| (c) skills, prompts, resources, and why | **Yes, no longer thin** | Section 3 names the tools, then gives a reason for each step (grill so the decisions were yours, small tickets, test-first, independent review) and points to the two real prompts quoted in the README |
+| (d) future improvements | Yes | Event-date field; session invalidation, with why it was accepted |
 
-**Unmet requirement (the one thin answer):** (c). That is enough for tier 2 on its own. Separately, the 3 tier asks for claims "verifiable in the repo", and three claims are not today:
-1. the ChatGPT use (outside the repo; the report says it rests on your account);
-2. "T08 also began with `/clear`" and the T08 `.env.example` discovery, which depend on the T08 transcript, written only when this session ends;
-3. "my own `.env` had quotes" (a git-ignored file).
+**What is left (the tier-3 requirement "claims verifiable in the repo"):**
+1. The ChatGPT use is a claim about a tool outside the repository. The report says it rests on your account. I do not require an export. A judge may treat it as an attestation; if so this item is not affected.
+2. The fresh-session claim for T08. The report no longer claims it for T01 to T08 alike: it says the committed transcripts show T01 to T07 and that T08's is not saved yet. That is accurate today, and the point resolves itself once that transcript is committed.
 
-I do **not** count (1) as something you must prove with an export. It is an attestation about a tool outside the project, and the rubric offers no way to verify it. (2) fixes itself when the transcript is committed. If a judge discounts (1) and (3) as attestations, then only (c) stands between this item and 3.
+The aside "my own `.env` had quotes" (a claim about a git-ignored file) has been removed from the report.
+
+If a judge counts neither remaining item, G1 is 3; if it counts either, 2. I keep 2.
+
+**The fresh-context sentence against the transcripts**
+
+| Ticket (issue) | Session | How it began | `implement` invoked |
+|---|---|---|---|
+| T01 (#2) | 07 | `/clear` | #2 |
+| T02 (#3) | 09 | `/clear` | #3 |
+| T03 (#4) | 18 | `/clear` | #4. Session 09 had also received `implement #4`, and the assistant declined to start it ("one ticket per session"), so no T03 work happened in that context |
+| T04 (#5) | 13 | the `implement` command as the first input | #5 |
+| T05 (#6) | 14 | `/clear` | #6 |
+| T06 (#7) | 15 | `/clear` | #7. Session 16 invoked `implement #7` again, implemented nothing (already done), and pushed the commit |
+| T07 (#8) | 17 | `/clear` | #8 (three invocations within the one session) |
+| T08 (#9) | this session | `/clear`, then `implement #9` (seen in the conversation, not in a committed transcript) | not yet verifiable from the repo |
+| T07b (#10) | 19 | "Resume the ASA CMS project..." at 00:31Z, a status and push session. The T07 push was at 00:33Z, the design request at 00:38Z in the same session | The design follow-up **continued in an existing session**, as the report says |
 
 ## Decision for you: `mp2-final`
 
@@ -243,7 +263,7 @@ The tag still points at `e3b0788`, which lacks the repairs and the dependency de
 
 | Option | Effect |
 |---|---|
-| Leave it | About 87 if the grader uses `--env-file`; about 71 if it follows the rubric's commands literally. Editors overflow at 390 px; no success messages |
-| Move it to `main` (`git tag -f`, then a forced tag push) | About 90, no setup risk. A rewritten tag after the deadline is visible; I will not do it without your say-so |
+| Leave it | About 89 if the grader uses `--env-file`; about 73 if it follows the rubric's commands literally. Editors overflow at 390 px; no success messages; no `cms deploy` or Backends tests |
+| Move it to `main` (`git tag -f`, then a forced tag push) | About 93, no setup risk. A rewritten tag after the deadline is visible; I will not do it without your say-so |
 
 My suggestion is to do your own items (A3, A5, G1, A2, H4) first and move the tag once, afterwards. Nothing was moved by any of this work.
