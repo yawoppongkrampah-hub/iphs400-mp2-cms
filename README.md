@@ -66,6 +66,7 @@ Screenshots of the six admin screens at 1280 px and 390 px are in `docs/screensh
 ## Generative AI Use Statement
 
 **Models.** Claude Sonnet 5 and Sonnet 5.5, through Claude Code on a Claude Pro account.
+I also used ChatGPT to help me understand the assignment, think through CMS decisions, review Claude Code's output, and refine the website design and submission steps. I did not record which ChatGPT model.
 **Skills.** The mattpocock-skills plugin: `setup-matt-pocock-skills`, `ask-matt`, `grilling`,
 `domain-modeling`, `to-spec`, `to-tickets`, `tdd`, `implement`, `code-review` and `handoff`.
 The process was grill, spec, eight tickets, then one ticket per session, each ending in a
@@ -77,10 +78,7 @@ The process was grill, spec, eight tickets, then one ticket per session, each en
 
 > Before creating tickets, edit spec issue #1. In the Problem Statement, remove the unverified claim "Today ASA has no site that does this." Do not replace it with another claim about ASA's current website or communication. Change "find upcoming events" to "find event announcements," since this version has no event-date field or automatic upcoming/past sorting. Keep the rest of the spec as written. Show me the revised Problem Statement and confirm the issue was updated.
 
-**One real model failure.** The first draft of the spec, written by the model, stated as fact
-that "Today ASA has no site that does this." The client brief does not say that, so it was a claim nobody had checked.
-I caught it on review and had it removed before any ticket was written, along with "upcoming events", which promised sorting this version does not build.
-The rule that no claim about ASA goes beyond the brief is now in `CONTEXT.md`.
+**One real model failure.** The model's first spec draft claimed that ASA had no website serving these needs, even though I had not provided that information. We caught the claim while reviewing issue #1 and removed it before creating the implementation tickets.
 
 ### Backends used
 
@@ -88,5 +86,5 @@ The rule that no claim about ASA goes beyond the brief is now in `CONTEXT.md`.
 |---|---|---|---|
 | Anthropic | Sonnet 5 / Sonnet 5.5 | Everything: grill, spec, tickets, all implementation and reviews | none needed |
 
-No other backend was used. The `provider` column of `notes/usage-ledger.csv` says `anthropic`
+No other Claude Code backend was used (ChatGPT was a separate assistant outside Claude Code, so it has no row here). The `provider` column of `notes/usage-ledger.csv` says `anthropic`
 on every row, and no commit has a `Backend:` trailer.
