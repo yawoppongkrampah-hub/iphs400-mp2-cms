@@ -5,7 +5,7 @@ description = "IPHS 400 MP2 — a small web CMS with a local admin console and a
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115",
-    "uvicorn[standard]>=0.32",     # also brings python-dotenv, which app/settings.py uses for .env
+    "uvicorn[standard]>=0.32",
     "jinja2>=3.1",
     "python-multipart>=0.0.12",   # form posts
     "itsdangerous>=2.2",          # signed session cookies
@@ -13,6 +13,7 @@ dependencies = [
     "markdown-it-py>=3.0",        # Markdown -> HTML
     "nh3>=0.2",                   # HTML sanitizer (strips <script> etc.)
     "ghp-import>=2.1",            # push site/ to the gh-pages branch
+    "python-dotenv>=1.0",         # reads .env at the repo root (app/settings.py); already locked via uvicorn
 ]
 
 [dependency-groups]

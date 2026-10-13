@@ -42,18 +42,24 @@ def screens(db_path):
             f"/admin/posts/{post_id}/edit", "/admin/pages", f"/admin/pages/{page_id}/edit"]
 
 
-def test_every_screen_has_the_navigation_with_a_working_sign_out(client_as, db_path):
+EDITOR_NAV = ["/admin", "/admin/content", "/admin/posts", "/admin/pages"]
+ADMIN_NAV = EDITOR_NAV + ["/admin/users"]
+FORMS = re.compile(r'<form [^>]*action="([^"]*)"')
+
+
+def test_the_navigation_is_exactly_the_same_set_for_a_role_on_every_screen(client_as, db_path):
+    """The older tests set the navigation aside; this one holds it to an exact list per role."""
     urls = screens(db_path)
-    for role in ("editor", "admin"):
+    for role, expected in (("editor", EDITOR_NAV), ("admin", ADMIN_NAV)):
         client = client_as(role)
         for url in urls + (["/admin/users", "/admin/users/new", "/admin/users/1"]
                            if role == "admin" else []):
             response = client.get(url)
             assert response.status_code == 200, url
             nav = nav_of(response.text)
-            for expected in ("/admin", "/admin/content", "/admin/posts", "/admin/pages"):
-                assert f'href="{expected}"' in nav, (role, url, expected)
-            assert 'action="/logout"' in nav and 'name="csrf_token"' in nav, (role, url)
+            assert LINKS.findall(nav) == expected, (role, url)
+            assert FORMS.findall(nav) == ["/logout"], (role, url)
+            assert 'name="csrf_token"' in nav, (role, url)
 
 
 def test_the_accounts_link_is_there_for_the_admin_and_never_for_an_editor(client_as, db_path):
@@ -66,9 +72,12 @@ def test_the_accounts_link_is_there_for_the_admin_and_never_for_an_editor(client
 def test_the_navigation_also_shows_on_the_refusal_page_and_the_preview(client_as):
     editor = client_as("editor")
     refused = editor.get("/admin/users")
-    assert refused.status_code == 403 and 'href="/admin/posts"' in nav_of(refused.text)
+    assert refused.status_code == 403
     preview = post_to(editor, "/admin/posts/preview", title="T", body="B")
-    assert 'href="/admin/content"' in nav_of(preview.text)
+    for page in (refused, preview):
+        nav = nav_of(page.text)
+        assert LINKS.findall(nav) == EDITOR_NAV and FORMS.findall(nav) == ["/logout"]
+        assert "/admin/users" not in page.text
 
 
 def test_the_sign_in_page_has_no_navigation(client):

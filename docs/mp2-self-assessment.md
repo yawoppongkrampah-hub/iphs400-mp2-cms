@@ -1,14 +1,22 @@
-# MP2 self-assessment, version 2 (rubric `mp2-v1-20260922`)
+# MP2 self-assessment, version 2.1 (rubric `mp2-v1-20260922`)
 
-Re-run on 2026-10-13 after the T09 repairs (#11). The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
+Re-run on 2026-10-13 after the T09 repairs (#11) and the review follow-up below. The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
 
 | Ref | Commit |
 |---|---|
 | `mp2-final` (unchanged) | `e3b0788d6086397d4c9daa638ce9321553fd6921` |
 | `mp2-mvp` (unchanged) | `06a30700441c06853352aeae52b1bd77b9946e33` |
-| `main` after the repairs | `c9b131c` (`afd69bd` is the T09 commit; `c9b131c` adds two behaviour tests) |
+| `main` after the repairs | the latest commit on `main` (`afd69bd` is the T09 commit; later commits add behaviour tests, this assessment, and the review follow-up) |
 
 This is an estimate by the assistant that wrote most of the code, the report draft and the README. It is not the instructor's judge, and a passing checker or test suite is not treated as full credit for any item. Anything I could not reach is marked **unverified**. Nothing here backdates or invents evidence; where a fix was made after the fact, it says so.
+
+## Review follow-up (this round)
+
+Done after the Spec review finished and before the follow-up commit:
+
+- **`python-dotenv` is now declared in `pyproject.toml`** (`python-dotenv>=1.0`), as you asked, because `app/settings.py` imports it directly. The resolved version is unchanged (1.2.3). `uv.lock` changed by exactly two lines (the new direct edge and its specifier), and `uv lock --check` and `uv sync --locked --dry-run` are clean. A test guards that it stays declared and locked. This closes the Standards reviewer's one "ask before adding a dependency" finding.
+- **The six older tests I had amended for the shared navigation were checked by mutation.** The amendments only set the navigation aside (the original assertions on each screen's own content are unchanged), so I broke the behaviour each test protects and confirmed it goes red. All 10 mutations were caught, each by a real assertion and not a crash: a Delete form pointing at the wrong route; the publish route that stops publishing; the refusal page's link pointing elsewhere; **an Editor allowed to delete a Post**; the role form posting to the wrong route; a Delete form added to the Preview; the navigation showing Accounts to an Editor (twice); the navigation's Sign out posting to the wrong route; and an extra form in the navigation. The files were restored from git after each run.
+- **Because those tests no longer look at the navigation, a new test holds it to an exact list.** For each role on every admin screen the navigation's links must be exactly `[/admin, /admin/content, /admin/posts, /admin/pages]` (plus `/admin/users` for the Admin) and its only form must be `/logout` with a CSRF token. That includes the refusal page and the Preview. Permission enforcement itself is unchanged and was not weakened: the refusal tests still run against the unchanged rule table.
 
 ## The score
 
@@ -101,7 +109,7 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
-| E1 | 3 | 3 | Fresh clone of `origin/main`: 409 passed (includes the Chrome-based test) | none |
+| E1 | 3 | 3 | Fresh clone of `origin/main`: 409 passed (includes the Chrome-based test); 409 again after the follow-up | none |
 | E2 | 2 | 1 | T04 and T06 criteria map to named tests; T06's phone-width criterion is now covered by a browser test. T08's criteria are covered by behaviour tests or `check_submission.py`, **except** the README Backends table and the checklist's step list and wording, which are reviewed by reading only (see the #11 review comment) | Deliberate: I declined a test that only checks documentation wording. This costs a point only if T08 is sampled |
 | E3 | 2 | 2 | Largest file 498 lines (`tests/test_t04_users.py`); split by concern; no commented-out blocks. The new files are smaller | none |
 | E4 | 1 | 1 | `tests/test_t09_setup.py` runs the rubric's commands in a clean copy | none |
@@ -159,11 +167,11 @@ Realistic ceiling: 90 now, about 96 if A3, A5, A2, G1 and H4 land.
 
 ## Decision for you: `mp2-final`
 
-The tag still points at `e3b0788`, which lacks the repairs. The evaluated commit is whatever the tag points at.
+The tag still points at `e3b0788`, which lacks the repairs and the dependency declaration. The evaluated commit is whatever the tag points at.
 
 | Option | Effect |
 |---|---|
 | Leave it | About 87 if the grader uses `--env-file`; about 71 if it follows the rubric's commands literally. Editors overflow at 390 px; no success messages |
 | Move it to `main` (`git tag -f`, then a forced tag push) | About 90, no setup risk. A rewritten tag after the deadline is visible; I will not do it without your say-so |
 
-My suggestion is to do your own items (A3, A5, G1, A2, H4) first and move the tag once, afterwards. Nothing was moved by this change.
+My suggestion is to do your own items (A3, A5, G1, A2, H4) first and move the tag once, afterwards. Nothing was moved by any of this work.

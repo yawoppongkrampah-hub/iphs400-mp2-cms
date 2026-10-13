@@ -190,8 +190,11 @@ def test_the_env_file_can_be_somewhere_else(clean_copy, tmp_path):
     assert result.stdout.strip() == "Title From Another File"
 
 
-def test_the_loader_package_is_already_locked_so_no_dependency_was_added():
+def test_the_loader_is_a_declared_and_locked_dependency():
+    """app/settings.py imports dotenv directly, so pyproject.toml must declare it."""
+    import tomllib
+    declared = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["dependencies"]
+    assert any(re.match(r"python-dotenv\b", requirement) for requirement in declared)
     lock = (ROOT / "uv.lock").read_text()
     assert 'name = "python-dotenv"' in lock
-    declared = (ROOT / "pyproject.toml").read_text()
-    assert "uvicorn[standard]" in declared            # the declared package that brings it in
+    assert '{ name = "python-dotenv", specifier = ">=1.0" }' in lock          # the direct edge
