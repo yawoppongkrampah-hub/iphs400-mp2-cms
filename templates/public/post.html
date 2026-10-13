@@ -1,8 +1,8 @@
 {% extends "public/base.html" %}
 {% block title %}{{ post.title }} · {{ site_title }}{% endblock %}
 {% block content %}
-  <article>
-    <h1>{{ post.title }}</h1>
+  <article class="prose">
+    <h1 class="page-title">{{ post.title }}</h1>
     <p class="meta">
       Posted <time datetime="{{ post.posted_iso }}">{{ post.posted_label }}</time>
       by {{ post.author_name }}{% if post.updated_iso %}
@@ -10,5 +10,5 @@
     </p>
     <div class="body">{{ post.body_html | safe }}</div>
   </article>
-  <p class="back"><a href="{{ root }}announcements.html">All announcements</a></p>
+  <p class="back prose"><a href="{{ root }}announcements.html">All announcements</a></p>
 {% endblock %}

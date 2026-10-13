@@ -47,7 +47,7 @@ The private name an account signs in with. It is never shown publicly as a bylin
 ## Public site
 
 **Home page**
-A short Welcome text followed by the latest Announcements.
+A hero holding the Welcome text and a Decorative graphic, followed by the latest Announcements.
 
 **Welcome text**
 The short greeting at the top of the Home page. It uses the wording from `notes/client-brief.md`: ASA is a Kenyon student group primarily for African students and students with African backgrounds, while welcoming anyone interested in African cultures and community. No other claims about ASA are made.
@@ -56,7 +56,13 @@ The short greeting at the top of the Home page. It uses the wording from `notes/
 The public menu: Announcements plus every published Page. The starter Pages for the demo are About ASA, Resources and Photos. They are placeholders, not a claim about ASA's real pages.
 
 **Event card**
-How an Announcement appears in the Announcements list. It is clear and readable on a phone.
+How an Announcement appears in the Announcements list. It shows a "Posted" label with the First-published date, an "Updated" label with the Updated date when there is one, the Display name byline, and an **Excerpt**: the first words of the Body as plain text, which is never a separate field and is cut at a word. The whole card is one link to the Post. It is clear and readable on a phone.
+
+**Short name**
+"ASA", shown in the public header and read out as "ASA home". The full name appears once on each page that needs it: as the Home page's hero heading. _Avoid_: repeating the full name in both the header and the hero.
+
+**Instagram link**
+A link to ASA's Instagram account, given by the project author, in the hero of the Home page and in the footer of every page. The account has not been checked by the project; the address can be changed without code. The link text is generic ("Follow us on Instagram"), so it stays right if the address changes.
 
 **Decorative graphic**
 A licensed image or graphic used for looks only. It is never presented as a photo of a real ASA event. Until ASA has permission for real photos, the Photos page says that actual event photos will be added then.

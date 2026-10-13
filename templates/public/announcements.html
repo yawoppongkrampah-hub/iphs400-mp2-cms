@@ -1,6 +1,6 @@
 {% extends "public/base.html" %}
 {% block content %}
-  <h1>Announcements</h1>
+  <h1 class="page-title">Announcements</h1>
   <div class="cards">
   {% for post in posts %}{% include "public/_card.html" %}{% else %}
     <p>No announcements yet.</p>

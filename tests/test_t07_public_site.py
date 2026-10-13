@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from app import posts, settings
-from app.publish import IMAGE_SUFFIXES, render_site
+from app.publish import EXCERPT_CHARS, IMAGE_SUFFIXES, card_excerpt, render_site
 from app.rendering import render_body
 from tests.test_t03_publish import (WELCOME, add_post, all_text, html_files, read,
                                     site_files, titles_in_order)
@@ -124,9 +124,9 @@ def test_home_cards_show_first_published_byline_and_updated(db_path, tmp_path):
     out = publish_with(db_path, tmp_path, None)
     day = posts.get(db_path, post_id)["first_published_at"][:10]
     card = re.search(r'<article class="card">.*?</article>', read(out, "index.html"), re.S).group(0)
-    assert f'Posted <time datetime="{day}"' in card
+    assert f'>Posted</span> <time datetime="{day}"' in card
     assert "ASA Events Team" in card
-    assert "Updated <time" in card
+    assert ">Updated</span> <time" in card
     assert "event date" not in card.lower()
 
 
@@ -334,11 +334,13 @@ def test_text_and_link_colours_are_readable_in_light_and_dark(db_path, tmp_path)
     light, dark = _tokens(css[:dark_start]), _tokens(css[dark_start:])
     pairs = [("text", "bg"), ("text", "surface"), ("muted", "bg"), ("muted", "surface"),
              ("link", "bg"), ("link", "surface"), ("on-accent", "accent"),
-             ("focus", "bg"), ("focus", "surface")]
+             ("focus", "bg"), ("focus", "surface"), ("text", "soft"), ("link", "soft"),
+             ("on-gold", "gold"), ("on-green", "green"), ("hero-text", "hero-bg"),
+             ("hero-soft", "hero-bg"), ("gold", "hero-bg"), ("hero-focus", "hero-bg")]
     for name, tokens in (("light", light), ("dark", dark)):
         for fore, back in pairs:
             ratio = contrast(tokens[fore], tokens[back])
-            needed = 3.0 if fore == "focus" else 4.5
+            needed = 3.0 if fore in ("focus", "hero-focus") else 4.5
             assert ratio >= needed, f"{name}: {fore} on {back} is {ratio:.2f}:1"
 
 
@@ -369,3 +371,112 @@ def test_the_whole_seeded_export_is_relative_and_has_no_drafts(db_path, tmp_path
     assert not any("draft" in p.name or "get-involved" in p.name for p in site_files(out))
     assert titles_in_order(read(out, "announcements.html")) == [
         "Afrobeat event (demo placeholder)"]
+
+
+# -- Warm redesign: header, hero, illustration, cards, Instagram ----------------------
+
+INSTAGRAM = "https://www.instagram.com/asa.kenyon/"
+FULL_NAME = settings.SITE_TITLE
+
+
+def test_the_full_name_is_not_repeated_in_the_header_and_the_hero(db_path, tmp_path):
+    seed_everything(db_path)
+    home = read(publish_with(db_path, tmp_path, settings.IMAGES), "index.html")
+    header = home.split("<header", 1)[1].split("</header>", 1)[0]
+    hero = home.split('<section class="hero">', 1)[1].split("</section>", 1)[0]
+    assert FULL_NAME not in header and settings.SITE_SHORT_TITLE in header
+    assert re.search(r"<h1>\s*%s\s*</h1>" % FULL_NAME, hero)
+    assert visible_text(home.split("</header>", 1)[1]).count(FULL_NAME) == 1
+
+
+def test_every_page_links_to_the_instagram_account_safely(db_path, tmp_path):
+    seed_everything(db_path)
+    out = publish_with(db_path, tmp_path, settings.IMAGES)
+    link = r'<a [^>]*href="%s"[^>]*>' % re.escape(INSTAGRAM)
+    for path in html_files(out):
+        html = path.read_text()
+        footer = html.split("<footer>", 1)[1]
+        assert re.search(link, footer), f"{path.name}: no footer link"
+        assert all('rel="noopener"' in found for found in re.findall(link, html)), path.name
+        # The hero button is on the Home page only.
+        assert len(re.findall(link, html)) == (2 if path.name == "index.html" else 1), path.name
+
+
+def test_the_hero_illustration_is_decorative_inline_and_not_a_photo_claim(db_path, tmp_path):
+    home = read(publish_with(db_path, tmp_path, None), "index.html")
+    art = re.search(r"<svg[^>]*>", home).group(0)
+    assert 'aria-hidden="true"' in art and 'focusable="false"' in art
+    hero = home.split('<section class="hero">', 1)[1].split("</section>", 1)[0]
+    assert "<img" not in hero
+    assert "photo" not in visible_text(hero).lower()
+
+
+def test_the_navigation_lists_the_three_starter_pages_when_published(db_path, tmp_path):
+    seed_everything(db_path)
+    out = publish_with(db_path, tmp_path, settings.IMAGES)
+    for name in ("index.html", "announcements.html", "posts/afrobeat-event-demo-placeholder.html"):
+        links = re.findall(r'<a [^>]*>([^<]+)</a>', main_nav(read(out, name)))
+        assert links == ["Announcements", "About ASA", "Resources", "Photos"], name
+
+
+def test_event_cards_show_dates_byline_excerpt_and_one_link(db_path, tmp_path):
+    add_post(db_path, "Afrobeat Night", "Join us for **music**, food.\n\n- What: a party\n")
+    card = read(publish_with(db_path, tmp_path, None), "index.html").split(
+        '<article class="card">', 1)[1].split("</article>", 1)[0]
+    assert "Posted" in card and "By " in card
+    assert "Join us for music, food. What: a party" in card
+    assert card.count("<a ") == 1
+
+
+def test_a_long_card_excerpt_is_cut_at_a_word_with_an_ellipsis():
+    text = card_excerpt("<p>" + "word " * 100 + "</p>")
+    assert text.endswith("word…") and len(text) <= EXCERPT_CHARS + 1
+
+
+def test_an_excerpt_keeps_a_word_that_ends_exactly_on_the_limit():
+    lead = "a" * (EXCERPT_CHARS - 5)               # lead + " last" is exactly EXCERPT_CHARS long
+    assert card_excerpt(f"<p>{lead} last more words</p>") == f"{lead} last…"
+
+
+def test_an_excerpt_cuts_one_unbroken_word_at_the_limit():
+    assert card_excerpt("<p>" + "x" * 400 + "</p>") == "x" * EXCERPT_CHARS + "…"
+
+
+@pytest.mark.parametrize("body_html, expected", [
+    ("", ""),
+    ('<p><img alt="A" src="images/a.png"></p>', ""),
+    ("<h2>What</h2><p>Party at nine</p>", "What Party at nine"),
+    ("<ul><li>What: a party</li><li>When: soon</li></ul>", "What: a party · When: soon"),
+    ("<p>Tom &amp; Jerry <strong>night</strong>, 8pm</p>", "Tom & Jerry night, 8pm"),
+])
+def test_card_excerpt_edge_cases(body_html, expected):
+    assert card_excerpt(body_html) == expected
+
+
+def test_a_card_for_a_post_with_no_text_has_no_excerpt_paragraph(db_path, tmp_path):
+    add_post(db_path, "Picture only", "![A drawing of a sun](images/demo-illustration-1.svg)\n")
+    home = read(publish_with(db_path, tmp_path, None), "index.html")
+    assert 'class="excerpt"' not in home and "Picture only" in home
+
+
+def test_a_card_excerpt_cannot_carry_markup(db_path, tmp_path):
+    add_post(db_path, "Sneaky", "Hello <script>alert(1)</script> **there** <b>x</b>\n")
+    home = read(publish_with(db_path, tmp_path, None), "index.html")
+    excerpt = re.search(r'<p class="excerpt">(.*?)</p>', home, re.S).group(1)
+    assert "<" not in excerpt and "alert" not in excerpt
+
+
+# -- Review follow-ups: focus and motion ------------------------------------------------
+
+def test_the_link_keeps_its_own_focus_ring_where_has_is_unsupported(db_path, tmp_path):
+    css = read(publish_with(db_path, tmp_path, None), "style.css")
+    assert css.count("outline-color: transparent") == 1
+    rule = next(line for line in css.splitlines() if "outline-color: transparent" in line)
+    assert rule.lstrip().startswith("@supports selector(:has(*))")
+
+
+def test_smooth_scrolling_is_only_for_people_who_have_not_asked_for_less_motion(
+        db_path, tmp_path):
+    css = read(publish_with(db_path, tmp_path, None), "style.css")
+    assert css.count("scroll-behavior") == 1
+    assert css.index("scroll-behavior") > css.index("prefers-reduced-motion: no-preference")

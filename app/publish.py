@@ -9,6 +9,8 @@ Two rules the rubric checks:
 """
 from __future__ import annotations
 
+import html
+import re
 import shutil
 import sqlite3
 from contextlib import closing
@@ -28,6 +30,7 @@ WELCOME = (
     "cultures and community."
 )
 HOME_ANNOUNCEMENTS = 5
+EXCERPT_CHARS = 140
 # Approved image files the release-holder may add to images/. Anything else is ignored.
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 
@@ -63,11 +66,29 @@ def _published_posts(database: Path) -> list[dict]:
     return [_post_for_template(row) for row in rows]
 
 
+def card_excerpt(body_html: str) -> str:
+    """The start of a Post's rendered Body as plain text, for its Event card.
+
+    Works on sanitized output, which holds only a handful of tags. Inline tags vanish
+    ("**demo**," stays "demo,"), block ends become spaces, and list items are told
+    apart by " · " so "What: a party When: soon" does not run together.
+    """
+    text = body_html.replace("</li>", " · ")
+    text = re.sub(r"</(?:p|ul|ol|h[1-6])>|<br\s*/?>", " ", text)
+    text = " ".join(html.unescape(re.sub(r"<[^>]+>", "", text)).split()).strip(" ·")
+    if len(text) <= EXCERPT_CHARS:
+        return text
+    # Cut at a word end: looking one character past the limit keeps a word that ends exactly on it.
+    cut = text[:EXCERPT_CHARS + 1].rsplit(" ", 1)[0][:EXCERPT_CHARS]
+    return cut.rstrip(" ,.;:·") + "…"
+
+
 def _post_for_template(row: sqlite3.Row) -> dict:
     posted_iso, posted_label = _day(row["first_published_at"])
+    body_html = render_body(row["body"], root="../")
     post = {
         "title": row["title"], "slug": row["slug"], "author_name": row["author_name"],
-        "body_html": render_body(row["body"], root="../"),
+        "body_html": body_html, "excerpt": card_excerpt(body_html),
         "posted_iso": posted_iso, "posted_label": posted_label,
         "updated_iso": None, "updated_label": None,
     }
@@ -106,7 +127,8 @@ def render_site(out: Path | None = None, database: Path | None = None,
     published_pages = pages.list_published(database)
     # Every page of the site shows the same Navigation; the template prefixes `root`.
     nav_pages = [{"title": page["title"], "slug": page["slug"]} for page in published_pages]
-    common = {"site_title": settings.SITE_TITLE, "nav_pages": nav_pages}
+    common = {"site_title": settings.SITE_TITLE, "short_title": settings.SITE_SHORT_TITLE,
+              "instagram_url": settings.INSTAGRAM_URL, "nav_pages": nav_pages}
 
     def write(name: str, template: str, **context) -> None:
         (out / name).write_text(env.get_template(template).render(

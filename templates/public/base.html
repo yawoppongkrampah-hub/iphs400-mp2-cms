@@ -10,7 +10,7 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="site-header-inner">
-      <a class="site-name" href="{{ root }}index.html">{{ site_title }}</a>
+      <a class="site-name" href="{{ root }}index.html"><span aria-hidden="true" class="site-mark"></span>{{ short_title }}<span class="visually-hidden"> home</span></a>
       <nav aria-label="Main">
         <a href="{{ root }}announcements.html"{% if current == "announcements" %} aria-current="page"{% endif %}>Announcements</a>
         {% for nav_page in nav_pages %}<a href="{{ root }}{{ nav_page.slug }}.html"{% if current == nav_page.slug %} aria-current="page"{% endif %}>{{ nav_page.title }}</a>
@@ -19,6 +19,11 @@
     </div>
   </header>
   <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
-  <footer><small>IPHS 400 Mini-Project #2</small></footer>
+  <footer>
+    <div class="footer-inner">
+      <a href="{{ instagram_url }}" rel="noopener">Follow us on Instagram</a>
+      <small>IPHS 400 Mini-Project #2</small>
+    </div>
+  </footer>
 </body>
 </html>
