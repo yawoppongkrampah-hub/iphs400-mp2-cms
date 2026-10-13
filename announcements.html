@@ -3,26 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Announcements · ASA — African Student Association</title>
+  <title>Announcements · African Student Association</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <a class="site-name" href="index.html">ASA — African Student Association</a>
-    <nav aria-label="Main">
-      <a href="announcements.html">Announcements</a>
-    </nav>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-name" href="index.html"><span aria-hidden="true" class="site-mark"></span>ASA<span class="visually-hidden"> home</span></a>
+      <nav aria-label="Main">
+        <a href="announcements.html" aria-current="page">Announcements</a>
+        <a href="about-asa.html">About ASA</a>
+        <a href="resources.html">Resources</a>
+        <a href="photos.html">Photos</a>
+        
+      </nav>
+    </div>
   </header>
-  <main>
-  <h1>Announcements</h1>
+  <main id="main" tabindex="-1">
+  <h1 class="page-title">Announcements</h1>
+  <div class="cards">
   <article class="card">
-  <h2 class="card-title"><a href="posts/afrobeat-event-demo-placeholder.html">Afrobeat event (demo placeholder)</a></h2>
-  <p class="meta">
-    Posted <time datetime="2026-09-29">29 September 2026</time>
-    by ASA Events Team
+  <p class="card-dates">
+    <span class="chip">Posted</span> <time datetime="2026-09-29">29 September 2026</time>
   </p>
+  <h2 class="card-title"><a href="posts/afrobeat-event-demo-placeholder.html">Afrobeat event (demo placeholder)</a></h2>
+  <p class="byline">By ASA Events Team</p>
+  <p class="excerpt">This is a demo placeholder, not a real ASA announcement. What: an Afrobeat event · When: to be announced · Where: to be announced · Who can…</p>
+  <p class="card-more" aria-hidden="true">Read the announcement &rarr;</p>
 </article>
+  </div>
 </main>
-  <footer><small>IPHS 400 Mini-Project #2</small></footer>
+  <footer>
+    <div class="footer-inner">
+      <a href="https://www.instagram.com/asa.kenyon/" rel="noopener">Follow us on Instagram</a>
+      <small>IPHS 400 Mini-Project #2</small>
+    </div>
+  </footer>
 </body>
 </html>

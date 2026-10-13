@@ -1,11 +1,299 @@
-/* Minimal starter styles — make them yours. */
-:root { color-scheme: light dark; }
-body { font: 16px/1.6 system-ui, sans-serif; margin: 0 auto; max-width: 42rem; padding: 1rem; }
-header { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: baseline; }
-header a { font-weight: 700; text-decoration: none; }
-a:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
-main { margin-block: 2rem; }
+/* Public site styles. Mobile-first; readable at about 390px. No external files.
+   Every text/background pair below is checked for contrast by tests/test_t07_public_site.py. */
+:root {
+  color-scheme: light;
+  --bg: #fff7ec;
+  --surface: #ffffff;
+  --soft: #f8e4bd;
+  --text: #2a1810;
+  --muted: #5f4b3e;
+  --link: #a1300c;
+  --accent: #b4360d;
+  --on-accent: #ffffff;
+  --gold: #f4b942;
+  --on-gold: #2a1810;
+  --green: #2b6a3c;
+  --on-green: #ffffff;
+  --focus: #0b57d0;
+  --line: #e6d6c0;
+  --hero-bg: #7b2511;
+  --hero-text: #fff6e8;
+  --hero-soft: #f7d9bd;
+  --hero-focus: #ffe08a;
+  --art-sun: var(--gold);
+  --art-hill-1: #a63a1a;
+  --art-hill-2: #2b6a3c;
+  --art-hill-3: #1d4a2a;
+  --art-cream: #fff1d6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #1a120d;
+    --surface: #261b14;
+    --soft: #3b2b1f;
+    --text: #f6ebdd;
+    --muted: #cdbba6;
+    --link: #ffab85;
+    --accent: #ffab85;
+    --on-accent: #1a120d;
+    --gold: #f4b942;
+    --on-gold: #1a120d;
+    --green: #7fcf95;
+    --on-green: #10200f;
+    --focus: #8ab4f8;
+    --line: #4d3d30;
+    --hero-bg: #3b160c;
+    --hero-text: #fff1de;
+    --hero-soft: #f0cdb0;
+    --hero-focus: #ffe08a;
+    --art-sun: var(--gold);
+    --art-hill-1: #7b2511;
+    --art-hill-2: #1f5232;
+    --art-hill-3: #12331d;
+    --art-cream: #f6dcae;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 1.0625rem/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow-wrap: anywhere;
+}
+
 img { max-width: 100%; height: auto; }
-.card { border: 1px solid; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-block: 1rem; }
-.card-title { margin: 0; font-size: 1.2rem; }
-.meta { margin: 0.25rem 0 0; font-size: 0.9rem; opacity: 0.8; }
+
+a { color: var(--link); text-underline-offset: 0.15em; }
+a:hover { text-decoration-thickness: 0.15em; }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+.skip-link:focus { top: 0.5rem; }
+
+/* Headings are serif, body text is sans: a warm voice with plain, readable copy. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  line-height: 1.2;
+}
+h1 { margin: 0 0 0.75rem; font-size: 2rem; }
+h2 { margin: 2rem 0 0.75rem; font-size: 1.5rem; }
+h3 { margin: 1.5rem 0 0.5rem; font-size: 1.25rem; line-height: 1.3; }
+h4, h5, h6 { margin: 1.25rem 0 0.5rem; font-size: 1.05rem; }
+
+/* Header: a bold colour band, the short name, then the Navigation. */
+.site-header {
+  background: var(--surface);
+  border-top: 0.5rem solid var(--accent);
+  border-bottom: 1px solid var(--line);
+}
+.site-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+}
+.site-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  color: var(--text);
+  font: 800 1.5rem/1 Georgia, "Iowan Old Style", serif;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+.site-mark {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) 0 33%, var(--gold) 33% 66%, var(--green) 66% 100%);
+}
+.site-header nav { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-inline: -0.5rem; }
+.site-header nav a {
+  display: inline-block;
+  padding: 0.6rem 0.9rem;           /* a comfortable touch target */
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 999px;
+}
+.site-header nav a:hover { background: var(--soft); }
+.site-header nav a[aria-current="page"] { background: var(--accent); color: var(--on-accent); }
+
+main { max-width: 64rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+main:focus { outline: 0; }
+.prose { max-width: 44rem; margin-inline: auto; }
+.page-title { margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 0.3rem solid var(--gold); display: inline-block; }
+
+/* Hero: a warm rounded panel with the greeting and an original decorative graphic. */
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-text);
+  border-bottom: 0.5rem solid var(--gold);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.hero-inner {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 2rem 1rem 1.5rem;
+}
+.hero h1 { margin: 0 0 1rem; font-size: 2.1rem; color: var(--hero-text); }
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--gold);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.welcome { margin: 0 0 1.5rem; max-width: 36rem; color: var(--hero-soft); font-size: 1.15rem; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0; }
+.hero :focus-visible { outline-color: var(--hero-focus); }
+.hero-art { display: block; width: 100%; max-width: 22rem; height: auto; margin-inline: auto; border-radius: 1rem; }
+
+.art-halo circle { stroke: var(--art-sun); stroke-width: 3; opacity: 0.55; }
+.art-halo .art-dots { stroke-width: 5; stroke-dasharray: 1 14; stroke-linecap: round; opacity: 0.9; }
+.art-sun { fill: var(--art-sun); }
+.art-birds path { stroke: var(--art-cream); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.art-hill-1 { fill: var(--art-hill-1); }
+.art-hill-2 { fill: var(--art-hill-2); }
+.art-hill-3 { fill: var(--art-hill-3); }
+.art-diamonds path { fill: var(--art-sun); }
+.art-diamonds path:nth-child(even) { fill: var(--art-cream); }
+
+/* Buttons */
+.button {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+.button:hover { text-decoration: underline; text-decoration-thickness: 0.12em; }
+.button-gold { background: var(--gold); color: var(--on-gold); }
+.button-outline { border-color: var(--hero-text); color: var(--hero-text); }
+.button-accent { background: var(--accent); color: var(--on-accent); margin-top: 1.5rem; }
+
+/* Event cards */
+.latest h2 { margin-top: 2rem; }
+.cards { display: grid; gap: 1rem; margin-block: 1rem; }
+.card {
+  position: relative;               /* the title link stretches over the whole card */
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 0.45rem solid var(--accent);
+  border-radius: 0.75rem;
+}
+.card:nth-child(3n + 2) { border-top-color: var(--gold); }
+.card:nth-child(3n + 3) { border-top-color: var(--green); }
+.card:hover { border-color: var(--accent); box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 0.12); }
+.card:has(a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+.card-dates { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin: 0; font-size: 0.95rem; }
+.chip {
+  display: inline-block;
+  padding: 0.05rem 0.6rem;
+  background: var(--soft);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+}
+.chip-updated { background: var(--green); color: var(--on-green); }
+
+.card-title { margin: 0.25rem 0 0; font-size: 1.35rem; }
+.card-title a { color: var(--text); text-decoration: none; }
+.card-title a::after { content: ""; position: absolute; inset: 0; border-radius: 0.75rem; }
+/* Where :has() works the card shows the focus ring; elsewhere the link keeps its own. */
+@supports selector(:has(*)) { .card-title a:focus-visible { outline-color: transparent; } }
+.card:hover .card-title a { color: var(--link); text-decoration: underline; text-decoration-thickness: 0.12em; }
+.byline { margin: 0; color: var(--muted); font-size: 0.95rem; font-weight: 600; }
+.excerpt { margin: 0.25rem 0 0; }
+.card-more { margin: auto 0 0; padding-top: 0.5rem; color: var(--link); font-weight: 700; }
+
+.meta { margin: 0.35rem 0 1.25rem; color: var(--muted); font-size: 0.95rem; }
+
+.body > :first-child { margin-top: 0; }
+.body img { display: block; margin-block: 1rem 0.25rem; border-radius: 0.5rem; }
+.body em { color: var(--muted); }
+.body ul, .body ol { padding-left: 1.4rem; }
+
+.back { margin-top: 1.5rem; }
+.back a { display: inline-block; padding: 0.5rem 0; font-weight: 700; }
+
+footer { border-top: 1px solid var(--line); background: var(--surface); }
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 1.75rem;
+}
+.footer-inner a { padding: 0.4rem 0; font-weight: 700; }
+.footer-inner small { color: var(--muted); }
+
+@media (min-width: 40rem) {
+  h1 { font-size: 2.4rem; }
+  .hero h1 { font-size: 2.8rem; }
+  .cards { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+}
+
+@media (min-width: 56rem) {
+  .hero-inner { grid-template-columns: 1.15fr 0.85fr; gap: 2.5rem; padding-block: 3rem 2.5rem; }
+  .hero h1 { font-size: 3.1rem; }
+  .hero-art { max-width: 26rem; }
+  .cards { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .card { transition: box-shadow 0.15s ease, transform 0.15s ease; }
+  .card:hover { transform: translateY(-2px); }
+}

@@ -3,29 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ASA — African Student Association</title>
+  <title>African Student Association</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <a class="site-name" href="index.html">ASA — African Student Association</a>
-    <nav aria-label="Main">
-      <a href="announcements.html">Announcements</a>
-    </nav>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-name" href="index.html"><span aria-hidden="true" class="site-mark"></span>ASA<span class="visually-hidden"> home</span></a>
+      <nav aria-label="Main">
+        <a href="announcements.html">Announcements</a>
+        <a href="about-asa.html">About ASA</a>
+        <a href="resources.html">Resources</a>
+        <a href="photos.html">Photos</a>
+        
+      </nav>
+    </div>
   </header>
-  <main>
-  <h1>ASA — African Student Association</h1>
-  <p class="welcome">ASA is a Kenyon student group primarily for African students and students with African backgrounds, while welcoming anyone interested in African cultures and community.</p>
-  <h2 class="section">Latest announcements</h2>
-  <article class="card">
-  <h2 class="card-title"><a href="posts/afrobeat-event-demo-placeholder.html">Afrobeat event (demo placeholder)</a></h2>
-  <p class="meta">
-    Posted <time datetime="2026-09-29">29 September 2026</time>
-    by ASA Events Team
+  <main id="main" tabindex="-1">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow">Welcome</p>
+        <h1>African Student Association</h1>
+        <p class="welcome">ASA is a Kenyon student group primarily for African students and students with African backgrounds, while welcoming anyone interested in African cultures and community.</p>
+        <p class="hero-actions">
+          <a class="button button-gold" href="#latest">See the latest announcements</a>
+          <a class="button button-outline" href="https://www.instagram.com/asa.kenyon/" rel="noopener">Follow us on Instagram</a>
+        </p>
+      </div>
+      <svg class="hero-art" viewBox="0 0 480 360" aria-hidden="true" focusable="false">
+        <g class="art-halo" fill="none">
+          <circle cx="318" cy="132" r="104" />
+          <circle class="art-dots" cx="318" cy="132" r="128" />
+        </g>
+        <circle class="art-sun" cx="318" cy="132" r="78" />
+        <g class="art-birds" fill="none">
+          <path d="M70 84q10-12 20 0q10-12 20 0" />
+          <path d="M126 52q8-10 16 0q8-10 16 0" />
+          <path d="M44 138q7-9 14 0q7-9 14 0" />
+        </g>
+        <path class="art-hill-1" d="M0 250C80 184 170 196 250 240S400 246 480 202V360H0Z" />
+        <path class="art-hill-2" d="M0 298C90 250 190 266 280 288S420 280 480 254V360H0Z" />
+        <path class="art-hill-3" d="M0 332C120 304 240 322 480 302V360H0Z" />
+        <g class="art-diamonds">
+          <path d="M28 330l14-14l14 14l-14 14z" />
+          <path d="M86 330l14-14l14 14l-14 14z" />
+          <path d="M144 330l14-14l14 14l-14 14z" />
+          <path d="M202 330l14-14l14 14l-14 14z" />
+          <path d="M260 330l14-14l14 14l-14 14z" />
+          <path d="M318 330l14-14l14 14l-14 14z" />
+          <path d="M376 330l14-14l14 14l-14 14z" />
+          <path d="M434 330l14-14l14 14l-14 14z" />
+        </g>
+      </svg>
+    </div>
+  </section>
+  <section class="latest" aria-labelledby="latest">
+    <h2 id="latest">Latest announcements</h2>
+    <div class="cards">
+    <article class="card">
+  <p class="card-dates">
+    <span class="chip">Posted</span> <time datetime="2026-09-29">29 September 2026</time>
   </p>
+  <h3 class="card-title"><a href="posts/afrobeat-event-demo-placeholder.html">Afrobeat event (demo placeholder)</a></h3>
+  <p class="byline">By ASA Events Team</p>
+  <p class="excerpt">This is a demo placeholder, not a real ASA announcement. What: an Afrobeat event · When: to be announced · Where: to be announced · Who can…</p>
+  <p class="card-more" aria-hidden="true">Read the announcement &rarr;</p>
 </article>
-  <p><a href="announcements.html">All announcements</a></p>
+    </div>
+    <a class="button button-accent" href="announcements.html">All announcements</a>
+  </section>
 </main>
-  <footer><small>IPHS 400 Mini-Project #2</small></footer>
+  <footer>
+    <div class="footer-inner">
+      <a href="https://www.instagram.com/asa.kenyon/" rel="noopener">Follow us on Instagram</a>
+      <small>IPHS 400 Mini-Project #2</small>
+    </div>
+  </footer>
 </body>
 </html>
