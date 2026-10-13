@@ -24,7 +24,7 @@ After the first public design looked sparse, I asked for a warmer, more inviting
 
 ## 3. Resources and workflow
 
-- **Claude Code**; my setup recorded version 2.1.281, and later sessions used updated versions. Models: Sonnet 5 and Sonnet 5.5, the only models in the usage ledger. The course manual and rubric, and the mattpocock-skills plugin.
+- I used Claude Code with Sonnet 5 and Sonnet 5.5, plus ChatGPT for planning and review assistance. The only models in the usage ledger are Sonnet 5 and Sonnet 5.5. I also used the course manual and rubric and the mattpocock-skills plugin.
 - **ChatGPT.** I also used ChatGPT to help me understand the assignment, think through CMS decisions, review Claude Code's output, and refine the website design and submission steps.
 - I completed the grill, spec and ticket planning first. Each implementation ticket then used a fresh context, test-first development, and independent code review, with findings posted before its closing commit.
 
