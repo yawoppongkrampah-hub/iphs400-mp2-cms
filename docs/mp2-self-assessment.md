@@ -1,6 +1,6 @@
-# MP2 self-assessment, version 2.1 (rubric `mp2-v1-20260922`)
+# MP2 self-assessment, version 2.3 (rubric `mp2-v1-20260922`)
 
-Re-run on 2026-10-13 after the T09 repairs (#11) and the review follow-up below. The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
+Re-run on 2026-10-13 after the T09 repairs (#11), their review follow-up, and the T10 checks (#12). The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
 
 | Ref | Commit |
 |---|---|
@@ -18,12 +18,19 @@ Done after the Spec review finished and before the follow-up commit:
 - **The six older tests I had amended for the shared navigation were checked by mutation.** The amendments only set the navigation aside (the original assertions on each screen's own content are unchanged), so I broke the behaviour each test protects and confirmed it goes red. All 10 mutations were caught, each by a real assertion and not a crash: a Delete form pointing at the wrong route; the publish route that stops publishing; the refusal page's link pointing elsewhere; **an Editor allowed to delete a Post**; the role form posting to the wrong route; a Delete form added to the Preview; the navigation showing Accounts to an Editor (twice); the navigation's Sign out posting to the wrong route; and an extra form in the navigation. The files were restored from git after each run.
 - **Because those tests no longer look at the navigation, a new test holds it to an exact list.** For each role on every admin screen the navigation's links must be exactly `[/admin, /admin/content, /admin/posts, /admin/pages]` (plus `/admin/users` for the Admin) and its only form must be `/logout` with a CSRF token. That includes the refusal page and the Preview. Permission enforcement itself is unchanged and was not weakened: the refusal tests still run against the unchanged rule table.
 
+### T10 (#12): `cms deploy` and the Backends table, now tested
+
+- **`cms deploy` is tested without GitHub** (`tests/test_t10_deploy.py`, 6 tests): the real `cms publish` then the real `cms deploy`, run from a working repository whose `origin` is a temporary **local bare** repository. Git is limited to the `file` protocol and its global and system config are nulled, so nothing can reach GitHub; a test proves an https remote is refused by git itself (`transport 'https' not allowed`). The tests check that every exported file reaches `gh-pages` byte for byte plus `.nojekyll` only, that no `main` is created, that another branch on the remote is left alone, that a Draft never appears even on a second deploy, that an unpublished Post disappears on the next deploy, and that `deploy` refuses and pushes nothing when `site/` is missing.
+- **The Backends table is checked against the ledger and the commit trailers** (`scripts/check_backends.py`, 32 tests): ledger providers and models, table rows, `Backend:` trailers, and ChatGPT kept out of all three while disclosed in the README's own words. Negative controls cover each kind of disagreement. This is what the rubric's H6 asks for.
+- **Mutation check of both:** 28 of 29 deliberate breakages are caught, each by a named test. The one that is not: adding `-f` (force) to the push of the same `gh-pages` branch. It behaves identically unless someone else has pushed to `gh-pages` in between, and no test sets that up. I am calling it an equivalent-in-tests gap, not a pass.
+- **My first mutation run of the Backends check was invalid** (the file was untracked, so my restore step did nothing and mutations piled up). I discarded it, restored the file, and redid it with a copy-based restore. The honest run exposed four loose assertions, which I tightened before this commit. Both reviewers also found real problems (a dead filename assertion, a network test that could pass for the wrong reason, missing Git isolation variables, trailers in other cases or indented, a table hidden in a code block, model ids containing `/`, and an empty history passing), all fixed.
+
 ## The score
 
 | | Max | `mp2-final` as tagged | `main` (if the tag were moved) |
 |---|---|---|---|
 | Stage 1 | 15 | 15 | 15 |
-| A Authenticity | 17 | 12 | 12 |
+| A Authenticity | 17 | 14 | 14 |
 | B Workflow | 17 | 16 | 16 |
 | C Functionality | 15 | **15 only if the grader passes `--env-file`; about 0 if it uses the rubric's literal commands** | 15 |
 | D Security | 8 | 8 | 8 |
@@ -31,10 +38,10 @@ Done after the Spec review finished and before the follow-up commit:
 | F Site and admin UX | 7 | 4 | 7 |
 | G Docs | 6 | 5 | 5 |
 | H Compliance | 7 | 5 | 5 |
-| Stage 2 | 85 | 72 (or about 56 on the literal-commands reading) | 75 |
-| **Total** | 100 | **87** (or about 71) | **90** |
+| Stage 2 | 85 | 74 (or about 58 on the literal-commands reading) | 77 |
+| **Total** | 100 | **89** (or about 73) | **92** |
 
-Why the tag column moved from 85 to 87 without any code change: issue #10's missing "Blocked by" line was recorded (S1.5 +1, B2 +1). Issues are read live from GitHub, so that applies to the tag too. Everything that needed code or the new report lives only on `main`.
+Why the tag column moved from 85 to 89 without any code change: issue #10's missing "Blocked by" line was recorded (S1.5 +1, B2 +1), and A3 was rescored from 2 to 4 after the recheck below. Issues are read live from GitHub, so that applies to the tag too. Everything that needed code or the new report lives only on `main`.
 
 Separate from the score: **the submission is late** (see "Deadline compliance"). The extra points above do not change that.
 
@@ -70,8 +77,8 @@ So the numbers are the same either way; the follow-up changes how the evidence r
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
 | A1 | 5 | 5 (medium) | Session 03: the first 10 user turns each add an ASA fact, constraint or reason | none |
-| A2 | 3 | 2 | Glossary, brief and demo content are consistently ASA. `notes/cms-field-notes.md` has no mention of ASA | Optional dated addendum linking the notes to ASA; do not edit the 2026-09-28 text |
-| A3 | 4 | 2 (low) | Specifics exist, no listed word-tells, varied paragraph lengths. But the report was **drafted mostly by the assistant**; a few sentences are yours verbatim | Rewrite sections 2 and 4 in your own voice, with two things only you could say |
+| A2 | 3 | 2 | Tier 3 needs the notes, the glossary **and** the site content to be specific to the client; tier 2 is "specific in one or two". Glossary and site content are ASA-specific (33 terms; ASA Pages and Posts). **The field notes are not**: `notes/cms-field-notes.md` never mentions ASA or any client, and the only named thing in it is an "About the Helpline" test page. See the recheck section | See recheck section |
+| A3 | 4 | 4 (medium) | By the item's own wording the measure is met: at least 2 specifics and at most 2 tells. See the recheck section. My earlier 2 added a requirement the rubric does not have | none |
 | A4 | 3 | 3 | Both quoted prompts verified verbatim in the session 03 transcript; failure named; models and skills named | Re-read the failure paragraph |
 | A5 | 2 | 0 (unverified) | Every commit after setup has a `Co-Authored-By: Claude` trailer. Issue comments (including the #10 note and the #11 review) were written by the assistant. Your own words are only in prompts | Write at least 3 comments yourself, dated now. I have not written any for you |
 
@@ -109,8 +116,8 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
-| E1 | 3 | 3 | Fresh clone of `origin/main`: 409 passed (includes the Chrome-based test); 409 again after the follow-up | none |
-| E2 | 2 | 1 | T04 and T06 criteria map to named tests; T06's phone-width criterion is now covered by a browser test. T08's criteria are covered by behaviour tests or `check_submission.py`, **except** the README Backends table and the checklist's step list and wording, which are reviewed by reading only (see the #11 review comment) | Deliberate: I declined a test that only checks documentation wording. This costs a point only if T08 is sampled |
+| E1 | 3 | 3 | Fresh clone of `origin/main`: 409 passed at the last verified clone; 447 pass in the working tree after T10 (includes the Chrome-based test) | none |
+| E2 | 2 | 1 (conditional) | T03's criterion 7 (`cms deploy`) and T08's Backends table are now covered by behaviour tests. What is left uncovered is T08's checklist statements that are not behaviour: that Photo permission is confirmed by a leader, and that the checklist says the author runs it and claims no ASA owner or approval process. I have not added a wording test for them. See the recheck section | See recheck section |
 | E3 | 2 | 2 | Largest file 498 lines (`tests/test_t04_users.py`); split by concern; no commented-out blocks. The new files are smaller | none |
 | E4 | 1 | 1 | `tests/test_t09_setup.py` runs the rubric's commands in a clean copy | none |
 
@@ -127,7 +134,7 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
-| G1 | 3 | 2 | All four questions answered. The stale and inaccurate sentences are corrected. **Unverifiable: the ChatGPT use** (no ChatGPT conversation is in the repository; the report says it rests on your account) | A saved export or link would make it verifiable |
+| G1 | 3 | 2 | All four questions are answered. The 3 tier also needs "claims verifiable in the repo", and (c) "used and why" is thin: it says what was used but gives a reason only for ChatGPT, and cites no prompt. A few claims cannot be checked in the repo today (see the recheck section) | See recheck section |
 | G2 | 2 | 2 | Live URL, Run locally steps (now simpler and verified on a fresh clone), AI Use Statement with the Backends table | none |
 | G3 | 1 | 1 | 12 screenshots, retaken without cropping; a test checks their pixel widths | none |
 
@@ -150,20 +157,85 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 - **Moving `mp2-final` to `main` would make it later again.** It would not change H5 (already 0) but it replaces the tag's push time with a new, later one.
 - There is no evidence of an approved extension, and I have not assumed one. Lateness is routed to the instructor by the rubric.
 
-## Remaining deductions (`main`: 90, so 10 points)
+## Remaining deductions (`main`: 92, so 8 points)
 
 | Item | Lost | Achievable? | What would earn it |
 |---|---|---|---|
-| A2 | 1 | Partly | Dated addendum to the field notes, from you |
-| A3 | 2 | Yes, only you | Rewrite the report in your own voice |
+| A2 | 1 | Partly | Field notes that name the client and use its vocabulary: a dated addendum, since the original is from 2026-09-28 |
 | A5 | 2 | Yes, only you | Three comments in your own words, dated truthfully |
 | B7(b) | 1 | **No** | The ledger has no data for four sessions |
-| E2 | 1 | Only by a wording test I declined | Or the judge does not sample T08 |
-| G1 | 1 | Yes | A saved ChatGPT export or link |
+| E2 | 1 | Only by a wording test I declined, or luck in sampling | T08's checklist statements (Photo permission, who runs it, no ASA owner claimed) are the only criteria left without a test |
+| G1 | 1 | Largely | A fuller answer to (c); the T08 transcript committed when the session ends |
 | H4 | 1 | Yes, only you | Send the email |
 | H5 | 1 | **No** | Lateness; the instructor decides |
 
-Realistic ceiling: 90 now, about 96 if A3, A5, A2, G1 and H4 land.
+Realistic ceiling: 92 now, up to about 98 if A5, A2, E2, G1 and H4 all land (A5 +2, the others +1 each); E2 depends on whether you accept a wording test.
+
+## Recheck of A2, A3, E2 and G1 against the rubric's exact wording
+
+Only the rubric's own words are used as requirements. I do not require a ChatGPT export, a hand-written report, or a wording test.
+
+### A2: client specificity (3): 2 stands
+
+*Wording:* "Field notes and `CONTEXT.md` name a real or plausible client and use its vocabulary ... (3 = specific and consistent across notes, glossary, and site content; 2 = specific in one or two; 1 = generic)."
+
+| Part | Specific to the client? | Evidence |
+|---|---|---|
+| Glossary | Yes | `CONTEXT.md` has 33 bold terms (Event card, Display name, Permission refusal, Photo permission, Announcements...) and names ASA throughout |
+| Site content | Yes | Demo Posts and Pages are ASA placeholders (About ASA, Resources, Photos; an Afrobeat event); the Welcome text is the client brief's wording |
+| **Field notes** | **No** | `notes/cms-field-notes.md` has five WordPress observations and one admission. It contains **zero** mentions of ASA and names no client. Its only named item is a test page, "About the Helpline", which is not the client. It was committed in the same planning commit as the brief (`49e1c16`, 2026-09-28 22:26 EDT) |
+
+**Unmet requirement:** the notes do not name the client or use its vocabulary, so the three parts are not consistent. That is exactly the tier-2 description (specific in two of three). The default "Knox County Historical Society" clause does not apply. I am not calling the notes wrong: they record the tool, which is what S1.1 asks. The deduction is genuine and small. The honest way to address it is a clearly dated addendum, never an edit of the original text.
+
+### A3: report voice (4): the earlier 2 was wrong, now 4
+
+*Wording:* "Report contains >=2 specifics only you could write (a named bug, a dated decision, an admission of something that failed) and no more than 2 tells from the list below (4 = both, 3 = specifics with 3-4 tells, 2 = one specific, 1 = none but edited, 0 = unedited model output)."
+
+My earlier score of 2 rested on "the report was drafted mostly by the assistant". That is not the measure: section A says heavy AI use is expected and only *unedited* output costs points. The report was edited in several rounds, with your own sentences and facts in it, so the 0 and 1 tiers do not apply.
+
+| Requirement | Evidence in the report |
+|---|---|
+| Specific 1: named bug | The `.env.example` defect: `CMS_SITE_TITLE=African Student Association`, unquoted, which `uv` could not parse |
+| Specific 2: admission of something that failed | "My first seed test parsed the file by hand and passed anyway"; also T07b's issue "opened after the redesign already existed" |
+| More | The quoted invented claim "Today ASA has no site that does this", the ledger gap (sessions 04, 10, 11, 12), the dated snapshot (2026-10-13 02:37 UTC), your event-scheduling limitation |
+| Tells, at most 2 | Listed word-tells: none. Uniform paragraph length: no (5 to 206 words). Three-item parallel lists "everywhere": no (one group of 3 bullets, one of 5). Closing summary restating the opening: no (the last paragraph is the ledger caveat). So 0 to 1 |
+| Human tells present | Dates and names (#1, #10, T07b, 2026-10-13), admissions, sentence lengths from 5 to 39 words (standard deviation 8.8) |
+
+**Residual risk, not a deduction:** the `.env.example` paragraph is written about Claude Code in the third person ("Claude Code found..."), so a judge could read that specific as less "only you". The T07b and invented-claim specifics still make two.
+
+### E2: tests trace to acceptance criteria (2): 1, now at lower risk
+
+*Wording:* "Judge samples 3 tickets; each acceptance criterion has >=1 test that names or clearly exercises it (2 = all, 1 = >=half)."
+
+I read every criterion of all nine tickets (#2 to #10). Criteria that no test can exercise (T02 AC10 "the tests are read before they pass"; T07b's single criterion, a review comment) are set aside, since nothing could test them.
+
+| Ticket | Testable criterion that had no test | Status now |
+|---|---|---|
+| T03 (#4) AC7 | "`cms deploy` pushes the export to the GitHub Pages branch. The live URL shows a Published demo Post and does not show a Draft." | **Covered** by `tests/test_t10_deploy.py` (local bare repository; Draft absent on first and second deploy). The live URL part was checked by hand and is not a unit test |
+| T08 (#9) | "The README has ... the Backends used table." | **Covered** by `scripts/check_backends.py` and `tests/test_t10_backends.py` |
+| T08 (#9), partly | The release checklist's steps | `cms publish` and `cms deploy` (tests), the relative-path check and the Editor limit (behaviour tests), adding approved images (copy test) are covered. **Not covered:** confirming Photo permission (a human step), and the statements that the author runs the release and that no ASA owner or approval process is claimed (wording) |
+| T01 (#2) AC9 | "`.env.example` lists every variable needed" | Covered by the clean-copy setup tests |
+| T07 (#8) AC6 | contrast, focus, keyboard | Covered |
+
+**Unmet requirement:** only T08's checklist statements remain, and they are statements, not behaviour. I am not adding a test that greps the checklist's wording: it would prove the sentence exists, not that anything works. So I keep the point at 1, because a strict judge would call "each criterion" unmet if T08 is sampled. The sampling risk fell from about 58% (T03 or T08 among 3 of 9) to about 33% (T08 alone). If you want the point, the choice is yours: either accept the wording test, or accept the risk.
+
+### G1: report answers the four questions (3): 2 stands
+
+*Wording:* "(a) what you built and which grill decisions were yours; (b) one place the AI drifted or made something up, and how the workflow caught it; (c) skills, prompts, and resources used and why; (d) future improvements. 3 = all four, claims verifiable in the repo; 2 = all four with one unverifiable claim or one thin answer; 1 = one question missing."
+
+| Question | Met? | Evidence |
+|---|---|---|
+| (a) built, and your grill decisions | Yes | Section 1; the decisions match your session 03 answers |
+| (b) AI drift and how it was caught | Yes | The quoted claim, caught "while reviewing issue #1"; the `.env.example` defect, which a hand-parsing test missed and `uv` exposed. This meets the rubric's own anchor: it names the item, quotes the claim, and names the catching step |
+| **(c) skills, prompts, resources, and why** | **Thin** | Section 3 lists Claude Code, the two models, the course manual and rubric and the plugin, and gives a purpose only for ChatGPT. It does not say why those skills or that order, and it cites no prompt (the two real prompts are in the README) |
+| (d) future improvements | Yes | Event-date field; stronger session invalidation, with the reason it was accepted |
+
+**Unmet requirement (the one thin answer):** (c). That is enough for tier 2 on its own. Separately, the 3 tier asks for claims "verifiable in the repo", and three claims are not today:
+1. the ChatGPT use (outside the repo; the report says it rests on your account);
+2. "T08 also began with `/clear`" and the T08 `.env.example` discovery, which depend on the T08 transcript, written only when this session ends;
+3. "my own `.env` had quotes" (a git-ignored file).
+
+I do **not** count (1) as something you must prove with an export. It is an attestation about a tool outside the project, and the rubric offers no way to verify it. (2) fixes itself when the transcript is committed. If a judge discounts (1) and (3) as attestations, then only (c) stands between this item and 3.
 
 ## Decision for you: `mp2-final`
 

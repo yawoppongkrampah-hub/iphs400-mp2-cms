@@ -45,6 +45,7 @@ uv run cms publish   # write site/ from Published content
 uv run cms deploy    # push site/ to the gh-pages branch
 uv run pytest -q                     # the test suite
 uv run python scripts/check_submission.py --stage 2
+uv run python scripts/check_backends.py   # README Backends table vs ledger vs commit trailers
 ```
 
 Making content Live is a short, repeatable routine: see `docs/release-checklist.md`. It also
