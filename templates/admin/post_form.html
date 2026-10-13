@@ -6,10 +6,30 @@
 
   <form method="post" action="{% if post %}{{ route('save_post', post_id=post.id) }}{% else %}{{ route('create_post') }}{% endif %}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    {% if post %}<input type="hidden" name="post_id" value="{{ post.id }}">{% endif %}
     <p><label>Title <input name="title" value="{{ title_value }}" required></label></p>
+    {% if show_hint %}
+    <aside id="event-details-hint" class="notice" aria-label="Event details hint">
+      <p><strong>Writing an event announcement?</strong> Say these clearly in the text:</p>
+      <ul>
+        <li><strong>What</strong> is happening</li>
+        <li><strong>When</strong> it starts, with the date and time</li>
+        <li><strong>Where</strong> it is</li>
+        <li><strong>Who can attend</strong></li>
+      </ul>
+      <p><button type="submit" name="action" value="hide" formnovalidate
+                 formaction="{{ route('event_details_hint') }}">Hide this hint</button>
+        Your text stays as it is.</p>
+    </aside>
+    {% else %}
+    <p><button type="submit" name="action" value="show" formnovalidate
+               formaction="{{ route('event_details_hint') }}">Show the event details hint</button></p>
+    {% endif %}
     <p><label>Body (Markdown)<br>
       <textarea name="body" rows="14" cols="60">{{ body_value }}</textarea></label></p>
-    <p><button type="submit">{% if post %}Save changes{% else %}Save as Draft{% endif %}</button></p>
+    <p><button type="submit">{% if post %}Save changes{% else %}Save as Draft{% endif %}</button>
+      <button type="submit" formnovalidate formtarget="_blank"
+              formaction="{{ route('preview_post') }}">Preview</button></p>
   </form>
 
   {% if post %}

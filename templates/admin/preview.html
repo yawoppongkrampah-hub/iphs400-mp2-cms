@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block head %}<base href="{{ base_href }}">{% endblock %}
+{% block content %}
+  <p class="notice" role="note">Preview of the {{ kind }}. This is how it will look once it is Live.
+    Nothing has been saved or published. Close this tab to go back to the editor.</p>
+  <article class="prose">
+    <h1>{{ page_title }}</h1>
+    <div class="body">{{ body_html | safe }}</div>
+  </article>
+{% endblock %}

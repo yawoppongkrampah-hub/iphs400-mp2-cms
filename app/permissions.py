@@ -22,6 +22,8 @@ RULES: dict[str, frozenset[str]] = {
     "post.unpublish": EVERYONE,
     "post.delete": ADMIN_ONLY,
     "post.change_slug": ADMIN_ONLY,
+    "preview.view": EVERYONE,
+    "editor.hint": EVERYONE,
     "page.list": EVERYONE,
     "page.edit_body": EVERYONE,
     "page.create": ADMIN_ONLY,

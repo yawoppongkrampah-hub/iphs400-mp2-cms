@@ -31,10 +31,14 @@ def _found(request: Request, post_id: int):
     return post
 
 
+HIDE_HINT = "hide_event_hint"
+
+
 def _form(request: Request, *, post=None, status_code=200, **context):
+    # The Event details hint is shown unless this session has hidden it.
     return render(request, "admin/post_form.html", status_code=status_code,
                   title="Edit Post" if post else "New Post", user=request.state.user,
-                  post=post, **context)
+                  post=post, show_hint=not request.session.get(HIDE_HINT), **context)
 
 
 @router.get("", dependencies=[Depends(require("post.list"))])
@@ -57,6 +61,22 @@ def create_post(request: Request, title: str = Form(""), body: str = Form("")):
         return _form(request, status_code=400, error=str(error),
                      title_value=title, body_value=body)
     return RedirectResponse(_edit_url(request, post_id), status_code=303)
+
+
+@router.post("/hint", dependencies=[Depends(require("editor.hint"))])
+def event_details_hint(request: Request, action: str = Form(""), post_id: str = Form(""),
+                       title: str = Form(""), body: str = Form("")):
+    """Hide or show the Event details hint for this session.
+
+    The editor's current text comes back in the form, so hiding the hint never
+    costs what was typed. Nothing is saved; the hint is never part of the Body.
+    """
+    post = _found(request, int(post_id)) if post_id.isascii() and post_id.isdigit() else None
+    if action == "hide":
+        request.session[HIDE_HINT] = True
+    elif action == "show":
+        request.session.pop(HIDE_HINT, None)
+    return _form(request, post=post, title_value=title, body_value=body)
 
 
 @router.get("/{post_id}/edit", dependencies=[Depends(require("post.edit"))])

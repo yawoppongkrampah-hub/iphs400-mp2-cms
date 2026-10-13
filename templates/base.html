@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% block head %}{% endblock %}
   <title>{% block title %}{{ title }}{% endblock %}</title>
   <style>
     :root { --ink: #1b1b1b; --muted: #595959; --line: #d0d0d0; --accent: #1f4e8c; --card: #f6f6f6; }

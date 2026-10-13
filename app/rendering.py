@@ -28,6 +28,10 @@ _URL_SCHEMES = {"http", "https", "mailto"}
 # Approved image files are copied to <site>/images/. An Editor always writes
 # `images/<file>`; each page adds the `root` that gets from there to the site root.
 NO_ALT = "Image without a description"
+# Where a Post's or a Page's page sits relative to the site root. The export and the
+# Preview both use these, so they build the same links.
+POST_ROOT = "../"
+PAGE_ROOT = ""
 
 _HEADING = re.compile(r"<(/?)h([1-6])>")
 _IMG_WITHOUT_ALT = re.compile(r"<img(?![^>]*\salt=)")

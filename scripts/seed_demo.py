@@ -14,8 +14,10 @@ The rubric expects this to run clean on a fresh clone with .env.example values
 from __future__ import annotations
 
 import os
+import secrets
 import sys
 from contextlib import closing
+from pathlib import Path
 
 from app import accounts, pages, posts, settings
 from app.db import connect
@@ -31,12 +33,31 @@ def main() -> int:
 
     accounts.seed_demo_accounts(
         settings.DATABASE_PATH, admin_password=admin_pw, editor_password=editor_pw)
+    seed_demo_deactivated(settings.DATABASE_PATH)
     seed_demo_posts(settings.DATABASE_PATH)
     seed_demo_pages(settings.DATABASE_PATH)
-    print("Demo accounts ready: 'admin' and 'editor' (passwords from your environment). "
+    print("Demo accounts ready: 'admin' and 'editor' (passwords from your environment), "
+          "and one Deactivated account that cannot sign in. "
           "Demo Posts ready: one Published, one Draft. "
           "Demo Pages ready: About ASA, Resources and Photos Published, one Draft.")
+    if any(settings.is_placeholder_password(pw) for pw in (admin_pw, editor_pw)):
+        print("NOTE: a demo account is using the placeholder password from .env.example. "
+              "That is fine on your own laptop; choose your own in .env before anyone "
+              "else can reach the console.")
     return 0
+
+
+def seed_demo_deactivated(path: Path) -> None:
+    """One Deactivated account, so the demo can show that a former member cannot sign in.
+
+    Its password is random and thrown away: nobody, including the demo, can sign in as it.
+    """
+    try:
+        accounts.create_account(path, username="former-member", password=secrets.token_urlsafe(24),
+                                role="editor", display_name="Former member (demo)")
+    except accounts.UsernameTaken:
+        return
+    accounts.set_active(path, "former-member", False)
 
 
 # Placeholders only: no claim about ASA's real events, dates, places or people.

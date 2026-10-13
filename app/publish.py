@@ -21,7 +21,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from app import pages, settings
 from app.db import connect
-from app.rendering import render_body
+from app.rendering import PAGE_ROOT, POST_ROOT, render_body
 
 # The wording comes from notes/client-brief.md. Make no other claim about ASA.
 WELCOME = (
@@ -85,7 +85,7 @@ def card_excerpt(body_html: str) -> str:
 
 def _post_for_template(row: sqlite3.Row) -> dict:
     posted_iso, posted_label = _day(row["first_published_at"])
-    body_html = render_body(row["body"], root="../")
+    body_html = render_body(row["body"], root=POST_ROOT)
     post = {
         "title": row["title"], "slug": row["slug"], "author_name": row["author_name"],
         "body_html": body_html, "excerpt": card_excerpt(body_html),
@@ -97,19 +97,27 @@ def _post_for_template(row: sqlite3.Row) -> dict:
     return post
 
 
-def copy_images(source: Path, out: Path) -> None:
-    """Copy the release-holder's approved image files to <site>/images/.
+def is_approved_image(source: Path, path: Path) -> bool:
+    """An image file inside `source`: by extension, never hidden, never outside it.
 
-    Only image files are copied (by extension), and never hidden ones, so a stray
-    `.env` or script dropped in the folder cannot reach the public site.
+    So a stray `.env` or script dropped in the folder cannot reach the public site,
+    and the console's Preview cannot be asked for a file outside the folder.
     """
+    try:
+        relative = path.resolve().relative_to(source.resolve())
+    except (ValueError, OSError):
+        return False
+    return (path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
+            and not any(part.startswith(".") for part in relative.parts))
+
+
+def copy_images(source: Path, out: Path) -> None:
+    """Copy the release-holder's approved image files to <site>/images/."""
     if not source.is_dir():
         return
     for path in sorted(source.rglob("*")):
-        relative = path.relative_to(source)
-        if (path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
-                and not any(part.startswith(".") for part in relative.parts)):
-            target = out / "images" / relative
+        if is_approved_image(source, path):
+            target = out / "images" / path.relative_to(source)
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(path, target)
 
@@ -142,10 +150,11 @@ def render_site(out: Path | None = None, database: Path | None = None,
           title=f"Announcements · {settings.SITE_TITLE}", root="", posts=published,
           current="announcements")
     for post in published:
-        write(f"posts/{post['slug']}.html", "public/post.html", root="../", post=post,
+        write(f"posts/{post['slug']}.html", "public/post.html", root=POST_ROOT, post=post,
               title=post["title"], current="announcements")
     for page in published_pages:
         write(f"{page['slug']}.html", "public/page.html", root="", title=page["title"],
               current=page["slug"],
-              page={"title": page["title"], "body_html": render_body(page["body"])})
+              page={"title": page["title"],
+                    "body_html": render_body(page["body"], root=PAGE_ROOT)})
     return out

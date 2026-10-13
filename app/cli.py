@@ -35,6 +35,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "serve":
         import uvicorn
 
+        if settings.SECRET_KEY in settings.PUBLIC_SECRET_KEYS:
+            print("WARNING: CMS_SECRET_KEY is a value that is public in this repository, "
+                  "so anyone could forge a session cookie. Fine for a local demo; set a "
+                  "long random CMS_SECRET_KEY in .env before anyone else can reach the console.",
+                  file=sys.stderr)
         uvicorn.run("app.main:app", port=args.port, reload=args.reload)
         return 0
 
@@ -51,6 +56,9 @@ def main(argv: list[str] | None = None) -> int:
             print(error)
             return 1
         print(f"Created Admin account '{args.username}'.")
+        if settings.is_placeholder_password(password):
+            print("NOTE: that password is the placeholder from .env.example. Fine on your "
+                  "own laptop; choose your own in .env before anyone else can reach the console.")
         return 0
 
     if args.command == "publish":

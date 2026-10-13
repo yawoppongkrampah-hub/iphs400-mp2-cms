@@ -84,7 +84,7 @@ The Markdown text of a Post or Page. Allowed: headings, emphasis, lists, links, 
 The editor's view of a Post or Page. It shows the same rendered, sanitized content as the public page, not a separate approximation.
 
 **Event details hint**
-A short hint near the Post editor suggesting the body cover What, When, Where and Who can attend. It is not pre-filled into the body, and an Editor can hide it without deleting any content.
+A short hint near the Post editor suggesting the body cover What, When, Where and Who can attend. It is not pre-filled into the body, and an Editor can hide it without deleting any content. The choice lasts for that Editor's signed-in session; it is not stored on the account.
 
 ## Publishing
 
