@@ -4,8 +4,10 @@ Seam 3 (the `cms` command and scripts): run `scripts/seed_demo.py` as a new
 process, in an empty folder, with only the values in `.env.example`, then sign
 in to the console it built. No password, `.env` or database is read from the repo.
 """
+import json
 import os
 import re
+import shlex
 import sqlite3
 import subprocess
 import sys
@@ -186,3 +188,32 @@ def test_git_tracks_no_env_file_database_or_state():
                              text=True).stdout.split()
     assert [f for f in tracked if f.endswith((".db", ".env")) or f == ".env"] == []
     assert ".env.example" in tracked
+
+
+# -- the release checklist's two limits, as behaviour ---------------------------------
+
+def test_no_screen_or_route_accepts_a_file_so_an_editor_cannot_add_an_image(client_as):
+    """The checklist says an Editor cannot add an image file alone. There is nothing to add one with."""
+    editor = client_as("editor")
+    for url in ("/admin", "/admin/posts/new", "/admin/posts", "/admin/pages", "/admin/content"):
+        html = editor.get(url).text
+        assert 'type="file"' not in html and "multipart" not in html, url
+    assert "multipart/form-data" not in json.dumps(editor.app.openapi())
+
+
+def checklist_relative_path_command():
+    text = (ROOT / "docs" / "release-checklist.md").read_text()
+    return re.search(r"^\s+(grep -rEn '[^\n]+' site/)\s*$", text, re.M).group(1)
+
+
+def test_the_checklists_relative_path_check_is_quiet_on_a_real_export_and_catches_a_bad_one(
+        db_path, tmp_path):
+    from app.publish import render_site
+    out = render_site(tmp_path / "site", database=db_path)
+    command = shlex.split(checklist_relative_path_command().replace("site/", str(out) + "/"))
+    clean = subprocess.run(command, capture_output=True, text=True)
+    assert clean.returncode == 1 and clean.stdout == ""          # grep: no match, nothing printed
+
+    (out / "bad.html").write_text('<a href="/admin">x</a><img src="/images/a.png">')
+    caught = subprocess.run(command, capture_output=True, text=True)
+    assert caught.returncode == 0 and "bad.html" in caught.stdout
