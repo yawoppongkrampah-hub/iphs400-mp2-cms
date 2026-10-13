@@ -4,7 +4,7 @@ Yaw Oppong-Krampah · repo https://github.com/yawoppongkrampah-hub/iphs400-mp2-c
 
 ## 1. What I built, and the decisions that were mine
 
-I built a small CMS for the African Student Association (ASA) at Kenyon. A local admin console (FastAPI, Jinja, SQLite), never on the public internet, lets an Admin and Editors write Posts and Pages. `cms publish` turns only Published content into plain HTML, and `cms deploy` pushes it to GitHub Pages. The work ran as eight tickets (T01 to T08) plus a design ticket (T07b, opened after the redesign was built), and ends with 407 tests.
+I built a small CMS for the African Student Association (ASA) at Kenyon. A local admin console (FastAPI, Jinja, SQLite), never on the public internet, lets an Admin and Editors write Posts and Pages. `cms publish` turns only Published content into plain HTML, and `cms deploy` pushes it to GitHub Pages. The work ran as eight tickets (T01 to T08) plus a design ticket (T07b, opened after the redesign was built), and ends with 409 tests.
 
 My decisions in the grill:
 
