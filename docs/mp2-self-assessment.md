@@ -1,6 +1,6 @@
-# MP2 self-assessment, version 2.5 (rubric `mp2-v1-20260922`)
+# MP2 self-assessment, version 2.6 (rubric `mp2-v1-20260922`)
 
-Re-run on 2026-10-13 after the T09 repairs (#11), their review follow-up, the T10 checks (#12), and the final report wording. The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
+Re-run on 2026-10-13 after the T09 repairs (#11), their review follow-up, the T10 checks (#12), and the final report wording. Version 2.6 adds the T08 transcript (session 20), checks it for secrets, and replaces the report's "unchanged since" ledger wording with a reference to commit `afd69bd`. The scores do not change. The first version (written the evening of 2026-10-12) scored the tag at 85 and found the defects that #11 fixed. This version scores both the tag as it stands and the current `main`.
 
 | Ref | Commit |
 |---|---|
@@ -91,8 +91,8 @@ So the numbers are the same either way; the follow-up changes how the evidence r
 | B3 | 3 | 3 | All closing commits touch at least 3 of 4 layers | none |
 | B4 | 3 | 3 (integrity caveat) | By timestamp 9 of 9; #10 was written after the work | Disclosed in #10, the report and this document |
 | B5 | 3 | 3 | Review comment before close on every closed ticket | none |
-| B6 | 2 | 2 | (a) Hook tests pass (18); `docs/process/compaction-log.md` exists. It now holds **1 auto compaction** (this long session, `a77ef331`, 2026-10-13 05:17 UTC), written by the hook, which is the rubric's limit ("<=1"), so there is no margin left. (b) **8 of 8 sessions that invoked `/implement` began fresh** (after `/clear`, or with the command as the first input), per the committed transcripts: sessions 07 (#2), 09 (#3), 18 (#4), 13 (#5), 14 (#6), 15 (#7), 17 (#8), and 16 (#7 again, which implemented nothing because #7 was already done). Session 09 also received `implement #4`, and declined it under the one-ticket-per-session rule; T03 was built in fresh session 18. 1 auto compaction in the log (at the limit); 2 handoffs saved | Do not let another session auto-compact: a second entry would cost B6(b). Do the remaining steps in fresh sessions |
-| B7 | 3 | 2 | (a) plan committed before the first `/implement` commit: 1. (c) report now uses a dated ledger snapshot (2026-10-13 02:37Z, 90 rows, last 02:30Z) and matches `usage_report.py --remaining 0`: 1. **(b) the ledger covers 15 of 19 transcript sessions (79%): 0** | (b) not achievable honestly: sessions 04, 10, 11, 12 have no ledger rows. The report now says so; I did not add rows |
+| B6 | 2 | 2 | (a) Hook tests pass (18); `docs/process/compaction-log.md` exists. It now holds **1 auto compaction** (this long session, `a77ef331`, 2026-10-13 05:17 UTC), written by the hook, which is the rubric's limit ("<=1"), so there is no margin left. (b) **9 of 9 sessions that invoked `/implement` began fresh** (after `/clear`, or with the command as the first input), per the committed transcripts: sessions 07 (#2), 09 (#3), 18 (#4), 13 (#5), 14 (#6), 15 (#7), 17 (#8), 20 (#9; `/clear` at 00:58:40Z, `implement #9` at 00:58:47Z), and 16 (#7 again, which implemented nothing because #7 was already done). Session 09 also received `implement #4`, and declined it under the one-ticket-per-session rule; T03 was built in fresh session 18. 1 auto compaction in the log (at the limit); 2 handoffs saved | Do not let another session auto-compact: a second entry would cost B6(b). Do the remaining steps in fresh sessions |
+| B7 | 3 | 2 | (a) plan committed before the first `/implement` commit: 1. (c) the report cites the ledger as committed in `afd69bd` (2026-10-13 02:37Z, 90 rows, last row 02:30Z), which I re-ran with `usage_report.py --ledger` and which gives the report's 53 and 6 points: 1. **(b) the ledger covers 16 of 20 transcript sessions (80%; it was 15 of 19 at the snapshot): 0** | (b) not achievable honestly: sessions 04, 10, 11, 12 have no ledger rows. The report now says so; I did not add rows |
 
 ### C. Functionality (15): 15 on `main`
 
@@ -134,7 +134,7 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
-| G1 | 3 | 2 | All four questions are answered, and (c) is not thin: it says why the grill, small tickets, test-first development and independent review were used, and ties them to the two real README prompts. What is left is the "claims verifiable in the repo" part of the 3 tier: the ChatGPT use (rests on your account), and the fresh-session claim for T08, whose transcript is written when this session ends. The report now says exactly that: the committed transcripts show T01 to T07 began fresh, T08 is not saved yet, and the design follow-up and repairs continued in existing sessions | See recheck section |
+| G1 | 3 | 2 | All four questions are answered, and (c) is not thin: it says why the grill, small tickets, test-first development and independent review were used, and ties them to the two real README prompts. What is left is the "claims verifiable in the repo" part of the 3 tier: the ChatGPT use (rests on your account), and the fresh-session claim for T08, now settled by the committed session 20 transcript (`/clear`, then `implement #9`). The report says the committed transcripts show T01 to T08 began fresh, and that the design follow-up and repairs continued in existing sessions | See recheck section |
 | G2 | 2 | 2 | Live URL, Run locally steps (now simpler and verified on a fresh clone), AI Use Statement with the Backends table | none |
 | G3 | 1 | 1 | 12 screenshots, retaken without cropping; a test checks their pixel widths | none |
 
@@ -143,7 +143,7 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 | ID | Max | Earned | Evidence | Fix needed |
 |---|---|---|---|---|
 | H1 | 2 | 2 | `check_submission.py --stage 2`: 22/22 on the current files | none |
-| H2 | 1 | 1 | Report and 19 transcripts match the patterns (session 18 is the 2026-09-29 T03 session, named with the Oct 12 date) | none |
+| H2 | 1 | 1 | Report and 20 transcripts match the patterns (session 18 is the 2026-09-29 T03 session, named with the Oct 12 date) | none |
 | H3 | 1 | 1 | Both tags are on `origin` | none |
 | H4 | 1 | 0 (**unverified**) | The email has not been sent | Send it with the report attached |
 | H5 | 1 | 0 | See below | Not fixable |
@@ -164,11 +164,11 @@ At the tag, the same commands exit 1 ("Set CMS_ADMIN_PASSWORD…"), which is the
 | A2 | 1 | Partly | Field notes that name the client and use its vocabulary: a dated addendum, since the original is from 2026-09-28 |
 | A5 | 2 | Yes, only you | Three comments in your own words, dated truthfully |
 | B7(b) | 1 | **No** | The ledger has no data for four sessions |
-| G1 | 1 | Largely | The T08 transcript committed when the session ends. The ChatGPT use stays an attestation |
+| G1 | 1 | Only if the judge accepts an attestation | The T08 transcript is now committed, so the fresh-session claim is verifiable. What is left is the ChatGPT use, a claim about a tool outside the repo. I kept G1 at 2 for it |
 | H4 | 1 | Yes, only you | Send the email |
 | H5 | 1 | **No** | Lateness; the instructor decides |
 
-Realistic ceiling: 93 now, up to 98 if A5, A2, G1 and H4 all land (A5 +2, the others +1 each). B7(b) and H5 cannot be earned.
+Realistic ceiling: 93 now, up to 97 if A5, A2 and H4 land (A5 +2, the others +1 each), and 98 if the judge also accepts the ChatGPT attestation for G1. B7(b) and H5 cannot be earned.
 
 ## Recheck of A2, A3, E2 and G1 against the rubric's exact wording
 
@@ -237,11 +237,11 @@ I re-read every criterion of all nine tickets (#2 to #10). Against the two tests
 
 **What is left (the tier-3 requirement "claims verifiable in the repo"):**
 1. The ChatGPT use is a claim about a tool outside the repository. The report says it rests on your account. I do not require an export. A judge may treat it as an attestation; if so this item is not affected.
-2. The fresh-session claim for T08. The report no longer claims it for T01 to T08 alike: it says the committed transcripts show T01 to T07 and that T08's is not saved yet. That is accurate today, and the point resolves itself once that transcript is committed.
+2. ~~The fresh-session claim for T08.~~ Resolved in version 2.6: the T08 transcript is committed as session 20 and begins with `/clear`, then `implement #9`. The report now says T01 to T08 each began fresh.
 
 The aside "my own `.env` had quotes" (a claim about a git-ignored file) has been removed from the report.
 
-If a judge counts neither remaining item, G1 is 3; if it counts either, 2. I keep 2.
+If a judge accepts the ChatGPT attestation, G1 is 3; if not, 2. I keep 2.
 
 **The fresh-context sentence against the transcripts**
 
@@ -254,7 +254,7 @@ If a judge counts neither remaining item, G1 is 3; if it counts either, 2. I kee
 | T05 (#6) | 14 | `/clear` | #6 |
 | T06 (#7) | 15 | `/clear` | #7. Session 16 invoked `implement #7` again, implemented nothing (already done), and pushed the commit |
 | T07 (#8) | 17 | `/clear` | #8 (three invocations within the one session) |
-| T08 (#9) | this session | `/clear`, then `implement #9` (seen in the conversation, not in a committed transcript) | not yet verifiable from the repo |
+| T08 (#9) | 20 | `/clear` (2026-10-13T00:58:40Z), then `implement #9` (00:58:47Z) | #9. This session also carried the T09 and T10 repairs afterwards, until 17:06Z |
 | T07b (#10) | 19 | "Resume the ASA CMS project..." at 00:31Z, a status and push session. The T07 push was at 00:33Z, the design request at 00:38Z in the same session | The design follow-up **continued in an existing session**, as the report says |
 
 ## Decision for you: `mp2-final`

@@ -37,3 +37,8 @@ Repo: /Users/yawoppong-krampah/code/iphs400-mp2-cms (branch `main`, in sync with
 - The deploy tests use a temporary local bare repository with only the `file` protocol allowed; nothing contacts GitHub.
 - Commit trailer used throughout: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. No `Backend:` trailer is needed (everything was Anthropic; ChatGPT was separate assistance, disclosed in the README and the report).
 - Never invent usage rows, comments, timestamps or an extension, and never backdate anything.
+
+## Update: step 1 done (2026-10-13, fresh session)
+- The T08 transcript is saved as `docs/transcripts/iphs400_mp2-cms_chat-session_20_yaw-oppong-krampah_20261013.md` (renamed from `..._your-name_...`). It has no matches for the checker's regex or the other secret patterns; the `.env` values that appear in it equal the committed `.env.example` placeholders. It begins with `/clear` then `implement #9`, so the report now says T01 to T08 each began fresh.
+- The report cites the ledger as committed in `afd69bd` instead of "unchanged since", so the newer ledger could be committed. The current ledger covers 16 of 20 sessions (still missing 04, 10, 11 and 12). Self-assessment is version 2.6; scores are unchanged (93 on `main`, 89 for the tag).
+- Steps 2 to 4 and both tags are untouched.
