@@ -26,7 +26,7 @@ this project, not an ASA policy.
 
 ## 2. Publish and check
 
-- [ ] `uv run --env-file .env cms publish` writes `site/` from Published content only.
+- [ ] `uv run cms publish` writes `site/` from Published content only.
       Drafts never leave the database. Never edit `site/` by hand: it is rebuilt.
 - [ ] **Relative-path check.** This must print nothing:
 
@@ -38,7 +38,7 @@ this project, not an ASA policy.
 
 ## 3. Deploy and confirm
 
-- [ ] `uv run --env-file .env cms deploy` pushes `site/` to the `gh-pages` branch.
+- [ ] `uv run cms deploy` pushes `site/` to the `gh-pages` branch.
 - [ ] Wait up to ten minutes, then open the Live URL (in the README) and find the change.
       Only now is it Live.
 

@@ -13,7 +13,7 @@
   <form method="post" action="{{ route('save_page_body', page_id=page.id) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <p><label>Body (Markdown)<br>
-      <textarea name="body" rows="14" cols="60">{{ page.body }}</textarea></label></p>
+      <textarea name="body" rows="14">{{ page.body }}</textarea></label></p>
     <p><button type="submit">Save changes</button>
       <button type="submit" formnovalidate formtarget="_blank"
               formaction="{{ route('preview_page', page_id=page.id) }}">Preview</button></p>

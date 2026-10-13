@@ -13,7 +13,7 @@ from fastapi.responses import RedirectResponse
 
 from app import pages
 from app.permissions import require
-from app.web import render
+from app.web import flash, render
 
 router = APIRouter(prefix="/admin/pages")
 
@@ -64,6 +64,7 @@ def create_page(request: Request, title: str = Form(""), slug: str = Form(""),
         code = 409 if isinstance(error, pages.PageSlugTaken) else 400
         return _new_form(request, status_code=code, error=str(error),
                          title_value=title, slug_value=slug, body_value=body)
+    flash(request, "Page created as a Draft.")
     return RedirectResponse(_edit_url(request, page_id), status_code=303)
 
 
@@ -76,6 +77,7 @@ def edit_page(request: Request, page_id: int):
 def save_page_body(request: Request, page_id: int, body: str = Form("")):
     _found(request, page_id)
     pages.update_body(_db(request), page_id, body)
+    flash(request, "Changes saved.")
     return RedirectResponse(_edit_url(request, page_id), status_code=303)
 
 
@@ -86,6 +88,7 @@ def retitle_page(request: Request, page_id: int, title: str = Form("")):
         pages.retitle(_db(request), page_id, title)
     except pages.PageError as error:
         return _edit_form(request, page, status_code=400, title_error=str(error))
+    flash(request, "Title changed. The Navigation shows it after the next cms publish and cms deploy.")
     return RedirectResponse(_edit_url(request, page_id), status_code=303)
 
 
@@ -97,6 +100,7 @@ def change_page_slug(request: Request, page_id: int, slug: str = Form("")):
     except pages.PageError as error:
         code = 409 if isinstance(error, pages.PageSlugTaken) else 400
         return _edit_form(request, page, status_code=code, slug_error=str(error))
+    flash(request, "Slug changed. An old link to this Page may no longer work.")
     return RedirectResponse(_edit_url(request, page_id), status_code=303)
 
 
@@ -104,6 +108,7 @@ def change_page_slug(request: Request, page_id: int, slug: str = Form("")):
 def publish_page(request: Request, page_id: int):
     _found(request, page_id)
     pages.publish(_db(request), page_id)
+    flash(request, "Marked Published. It joins the Navigation after cms publish and cms deploy have run.")
     return RedirectResponse(_edit_url(request, page_id), status_code=303)
 
 
@@ -111,6 +116,7 @@ def publish_page(request: Request, page_id: int):
 def unpublish_page(request: Request, page_id: int):
     _found(request, page_id)
     pages.unpublish(_db(request), page_id)
+    flash(request, "Marked Draft. It leaves the Navigation after the next cms publish and cms deploy.")
     return RedirectResponse(_edit_url(request, page_id), status_code=303)
 
 
@@ -118,4 +124,5 @@ def unpublish_page(request: Request, page_id: int):
 def delete_page(request: Request, page_id: int):
     _found(request, page_id)
     pages.delete(_db(request), page_id)
+    flash(request, "Page deleted.")
     return RedirectResponse(request.app.url_path_for("page_list"), status_code=303)

@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 from app import settings
-from tests.conftest import DEMO_USERS, csrf_token
+from tests.conftest import DEMO_USERS, csrf_token, own_content
 from tests.test_t02_posts import create_post, edit_page, is_refusal, post_to
 
 LINK = re.compile(r'<a [^>]*href="([^"]*)"')
@@ -16,11 +16,11 @@ FORM = re.compile(r'<form [^>]*action="([^"]*)"')
 
 
 def local_links(html):
-    return [h for h in LINK.findall(html) if h.startswith("/")]
+    return [h for h in LINK.findall(own_content(html)) if h.startswith("/")]
 
 
 def form_actions(html):
-    return FORM.findall(html)
+    return FORM.findall(own_content(html))
 
 
 def test_admin_templates_hard_code_no_root_absolute_path():
@@ -99,7 +99,7 @@ def test_signed_out_sign_in_form_posts_and_sign_out_form_returns_to_it(client):
 
     dashboard = client.get("/admin").text
     assert "/admin/posts" in local_links(dashboard)
-    (logout,) = form_actions(dashboard)
+    (logout,) = FORM.findall(dashboard)        # the navigation's Sign out, on every screen
     signed_out = post_to(client, logout)
     assert signed_out.status_code == 303 and signed_out.headers["location"] == "/login"
     assert client.get("/admin", follow_redirects=False).status_code in (302, 303)

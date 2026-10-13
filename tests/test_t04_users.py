@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 
 from app.main import create_app
 from app.publish import render_site
-from tests.conftest import DEMO_USERS, csrf_token, token_in
+from tests.conftest import DEMO_USERS, csrf_token, own_content, token_in
 from tests.test_t02_posts import create_post, is_refusal, post_to
 
 NEW_PASSWORD = "brand-new-secret-1"
@@ -486,13 +486,18 @@ def test_every_account_form_carries_a_csrf_token(client_as):
     assert admin.get(f"/admin/users/{target}").text.count("<form") >= 4
 
 
+def account_form_actions(client, user_id):
+    """The account page's own forms: the navigation's Sign out form is on every screen."""
+    return re.findall(r'<form [^>]*action="([^"]*)"', own_content(account_page(client, user_id)))
+
+
 def test_account_form_actions_point_at_the_nested_routes(client_as):
     admin = client_as("admin")
     target = create_account(admin)
     base = f"/admin/users/{target}"
-    actions = re.findall(r'<form [^>]*action="([^"]*)"', account_page(admin, target))
+    actions = account_form_actions(admin, target)
     assert actions == [f"{base}/display-name", f"{base}/role", f"{base}/password",
                        f"{base}/deactivate"]
     post_to(admin, f"{base}/deactivate")
-    actions = re.findall(r'<form [^>]*action="([^"]*)"', account_page(admin, target))
+    actions = account_form_actions(admin, target)
     assert actions[-1] == f"{base}/reactivate"

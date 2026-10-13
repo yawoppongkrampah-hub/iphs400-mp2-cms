@@ -26,7 +26,7 @@
                formaction="{{ route('event_details_hint') }}">Show the event details hint</button></p>
     {% endif %}
     <p><label>Body (Markdown)<br>
-      <textarea name="body" rows="14" cols="60">{{ body_value }}</textarea></label></p>
+      <textarea name="body" rows="14">{{ body_value }}</textarea></label></p>
     <p><button type="submit">{% if post %}Save changes{% else %}Save as Draft{% endif %}</button>
       <button type="submit" formnovalidate formtarget="_blank"
               formaction="{{ route('preview_post') }}">Preview</button></p>

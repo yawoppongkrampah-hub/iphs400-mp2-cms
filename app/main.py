@@ -11,6 +11,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
 
 from app import security, settings
@@ -40,6 +42,32 @@ def create_app(database: Path | None = None) -> FastAPI:
     def refuse(request: Request, _: PermissionRefused):
         return render(request, "admin/refused.html", status_code=403,
                       title="No permission", user=request.state.user)
+
+    def error_page(request: Request, status_code: int, heading: str, message: str):
+        """A readable page, with the navigation when signed in, instead of raw JSON."""
+        user = getattr(request.state, "user", None)
+        back_route, back_label = (("dashboard", "Back to the dashboard") if user
+                                  else ("login_form", "Go to sign in"))
+        return render(request, "admin/error.html", status_code=status_code, title=heading,
+                      user=user, heading=heading, message=message,
+                      back_url=request.app.url_path_for(back_route), back_label=back_label)
+
+    @app.exception_handler(StarletteHTTPException)
+    def http_error(request: Request, error: StarletteHTTPException):
+        if error.status_code == 403 and error.detail == security.CSRF_FAILURE:
+            return error_page(request, 403, "That form could not be sent",
+                              "The security token on the form was missing or out of date, "
+                              "so nothing was changed. Go back, reload the page and try again.")
+        if error.status_code == 404:
+            detail = str(error.detail)
+            message = detail if detail.startswith("No such") else "That address does not exist."
+            return error_page(request, 404, "Not found", message)
+        return error_page(request, error.status_code, "Something went wrong", str(error.detail))
+
+    @app.exception_handler(RequestValidationError)
+    def invalid_request(request: Request, _: RequestValidationError):
+        return error_page(request, 422, "That request was not understood",
+                          "Something in the address or form was not valid. Nothing was changed.")
 
     @app.get("/")
     def public_home(request: Request):

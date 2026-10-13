@@ -23,8 +23,8 @@ git clone https://github.com/yawoppongkrampah-hub/iphs400-mp2-cms.git
 cd iphs400-mp2-cms
 uv sync
 cp .env.example .env
-uv run --env-file .env python scripts/seed_demo.py
-uv run --env-file .env cms serve
+uv run python scripts/seed_demo.py
+uv run cms serve
 ```
 
 Open http://localhost:8000/admin and sign in as `admin` or `editor`, with the matching
@@ -32,16 +32,17 @@ Open http://localhost:8000/admin and sign in as `admin` or `editor`, with the ma
 Deactivated account (`former-member`) that cannot sign in, plus Published and Draft Posts
 and Pages. Run the seed again at any time; it never duplicates anything.
 
-`.env` is not loaded automatically, so keep `--env-file .env` on every `uv run`. `.env`,
-`*.db` and `site/` are in `.gitignore` and are never committed.
+The app reads `.env` from the repository root by itself, so no `--env-file` flag is needed (it
+still works). A variable already set in your shell wins over the file, and no value is ever
+printed. `.env`, `*.db` and `site/` are in `.gitignore` and are never committed.
 
 To start with your own first Admin instead of the demo accounts, set `CMS_ADMIN_PASSWORD`
-and run `uv run --env-file .env cms create-admin --username NAME --display-name "ASA Leadership"`.
+and run `uv run cms create-admin --username NAME --display-name "ASA Leadership"`.
 The password is read from the environment and never printed.
 
 ```bash
-uv run --env-file .env cms publish   # write site/ from Published content
-uv run --env-file .env cms deploy    # push site/ to the gh-pages branch
+uv run cms publish   # write site/ from Published content
+uv run cms deploy    # push site/ to the gh-pages branch
 uv run pytest -q                     # the test suite
 uv run python scripts/check_submission.py --stage 2
 ```

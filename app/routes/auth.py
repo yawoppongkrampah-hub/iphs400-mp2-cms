@@ -5,7 +5,7 @@ from fastapi import APIRouter, Form, Request
 from fastapi.responses import RedirectResponse
 
 from app import accounts, security
-from app.web import render
+from app.web import flash, render
 
 router = APIRouter()
 
@@ -33,4 +33,5 @@ def login(request: Request, username: str = Form(""), password: str = Form("")):
 @router.post("/logout")
 def logout(request: Request):
     security.sign_out(request)
+    flash(request, "You have signed out.")
     return RedirectResponse(request.app.url_path_for("login_form"), status_code=303)

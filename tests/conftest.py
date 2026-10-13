@@ -12,12 +12,16 @@ with a username, not an email address.
 """
 from __future__ import annotations
 
+import os
 import re
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app import accounts
+# Tests never read a developer's real .env (the settings module reads it at import time).
+os.environ.setdefault("CMS_ENV_FILE", os.devnull)
+
+from app import accounts  # noqa: E402
 from app.main import create_app
 
 # Matches scripts/seed_demo.py. Passwords come from the environment there; in
@@ -33,6 +37,11 @@ _TOKEN = re.compile(r'name="csrf_token" value="([^"]+)"')
 def csrf_token(client: TestClient, path: str = "/login") -> str:
     """Read the CSRF token from the form on `path` (what a browser would submit)."""
     return token_in(client.get(path).text)
+
+
+def own_content(html: str) -> str:
+    """A screen without the navigation every admin screen shares (that is tested on its own)."""
+    return re.sub(r'<nav[^>]*aria-label="Admin".*?</nav>', "", html, flags=re.S)
 
 
 def token_in(html: str) -> str:

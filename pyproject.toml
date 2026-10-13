@@ -5,7 +5,7 @@ description = "IPHS 400 MP2 — a small web CMS with a local admin console and a
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115",
-    "uvicorn[standard]>=0.32",
+    "uvicorn[standard]>=0.32",     # also brings python-dotenv, which app/settings.py uses for .env
     "jinja2>=3.1",
     "python-multipart>=0.0.12",   # form posts
     "itsdangerous>=2.2",          # signed session cookies

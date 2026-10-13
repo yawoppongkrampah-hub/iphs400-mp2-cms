@@ -16,6 +16,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from app import accounts
 
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+CSRF_FAILURE = "Invalid or missing CSRF token."
 
 
 def current_user(request: Request) -> sqlite3.Row | None:
@@ -58,7 +59,7 @@ async def verify_csrf(request: Request) -> None:
     form = await request.form()
     supplied = form.get("csrf_token") or ""
     if not expected or not secrets.compare_digest(str(supplied), expected):
-        raise HTTPException(status_code=403, detail="Invalid or missing CSRF token.")
+        raise HTTPException(status_code=403, detail=CSRF_FAILURE)
 
 
 class AdminGuard:

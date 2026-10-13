@@ -10,7 +10,7 @@ from fastapi.responses import RedirectResponse
 
 from app import accounts
 from app.permissions import require
-from app.web import render
+from app.web import flash, render
 
 router = APIRouter(prefix="/admin/users")
 
@@ -46,8 +46,8 @@ def _account(request: Request, user_id: int, *, status_code=200, **context):
                   roles=accounts.ROLES, **context)
 
 
-def _apply(request: Request, user_id: int, change, *, error_key: str):
-    """Run an account change; on success go back to the account, else show why."""
+def _apply(request: Request, user_id: int, change, *, error_key: str, done: str):
+    """Run an account change; on success say so and go back to the account, else show why."""
     try:
         change()
     except accounts.NoSuchAccount:
@@ -55,6 +55,7 @@ def _apply(request: Request, user_id: int, change, *, error_key: str):
     except accounts.AccountError as error:
         return _account(request, user_id, status_code=_status_for(error),
                         **{error_key: str(error)})
+    flash(request, done)
     return RedirectResponse(_account_url(request, user_id), status_code=303)
 
 
@@ -81,6 +82,7 @@ def create_user(request: Request, username: str = Form(""), password: str = Form
         return _new_form(request, status_code=_status_for(error), error=str(error),
                          username_value=username, display_name_value=display_name,
                          role_value=role)
+    flash(request, "Account created.")
     return RedirectResponse(_account_url(request, user_id), status_code=303)
 
 
@@ -93,7 +95,7 @@ def account_page(request: Request, user_id: int):
 def change_role(request: Request, user_id: int, role: str = Form("")):
     return _apply(request, user_id,
                   lambda: accounts.change_role(_db(request), user_id, role),
-                  error_key="role_error")
+                  error_key="role_error", done=f"Role changed to {role}.")
 
 
 @router.post("/{user_id}/deactivate", dependencies=[Depends(require("user.deactivate"))])
@@ -101,21 +103,23 @@ def deactivate_user(request: Request, user_id: int):
     return _apply(request, user_id,
                   lambda: accounts.deactivate(_db(request), user_id,
                                               acting_user_id=request.state.user["id"]),
-                  error_key="status_error")
+                  error_key="status_error",
+                  done="Account deactivated. Its owner can no longer sign in.")
 
 
 @router.post("/{user_id}/reactivate", dependencies=[Depends(require("user.reactivate"))])
 def reactivate_user(request: Request, user_id: int):
     return _apply(request, user_id,
                   lambda: accounts.reactivate(_db(request), user_id),
-                  error_key="status_error")
+                  error_key="status_error", done="Account reactivated.")
 
 
 @router.post("/{user_id}/password", dependencies=[Depends(require("user.reset_password"))])
 def reset_password(request: Request, user_id: int, password: str = Form("")):
     return _apply(request, user_id,
                   lambda: accounts.reset_password(_db(request), user_id, password),
-                  error_key="password_error")
+                  error_key="password_error",
+                  done="New password set. Pass it to its owner outside the CMS.")
 
 
 @router.post("/{user_id}/display-name",
@@ -123,4 +127,4 @@ def reset_password(request: Request, user_id: int, password: str = Form("")):
 def change_display_name(request: Request, user_id: int, display_name: str = Form("")):
     return _apply(request, user_id,
                   lambda: accounts.change_display_name(_db(request), user_id, display_name),
-                  error_key="display_name_error")
+                  error_key="display_name_error", done="Display name changed.")

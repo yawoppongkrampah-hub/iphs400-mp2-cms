@@ -128,7 +128,9 @@ def test_an_editors_preview_offers_no_admin_only_control(client_as, db_path):
     editor = client_as("editor")
     for response in (preview_post(editor), preview_page(editor, page_id)):
         assert response.status_code == 200
-        assert "<form" not in response.text and "<button" not in response.text
+        # the only form is the navigation's Sign out; Preview offers nothing else to press
+        assert re.findall(r'<form [^>]*action="([^"]*)"', response.text) == ["/logout"]
+        assert response.text.count("<button") == 1
         for admin_only in ("/admin/users", "/delete", "/slug", '/title"', "/unpublish",
                            "Delete this", "Change the slug", "Mark Published"):
             assert admin_only not in response.text

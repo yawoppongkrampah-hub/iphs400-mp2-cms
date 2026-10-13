@@ -11,7 +11,7 @@ from fastapi.responses import RedirectResponse
 
 from app import posts
 from app.permissions import require
-from app.web import render
+from app.web import flash, render
 
 router = APIRouter(prefix="/admin/posts")
 
@@ -60,6 +60,7 @@ def create_post(request: Request, title: str = Form(""), body: str = Form("")):
     except posts.PostError as error:
         return _form(request, status_code=400, error=str(error),
                      title_value=title, body_value=body)
+    flash(request, "Post saved as a Draft.")
     return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
@@ -93,6 +94,7 @@ def save_post(request: Request, post_id: int, title: str = Form(""), body: str =
     except posts.PostError as error:
         return _form(request, post=post, status_code=400, error=str(error),
                      title_value=title, body_value=body)
+    flash(request, "Changes saved.")
     return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
@@ -100,6 +102,7 @@ def save_post(request: Request, post_id: int, title: str = Form(""), body: str =
 def publish_post(request: Request, post_id: int):
     _found(request, post_id)
     posts.publish(_db(request), post_id)
+    flash(request, "Marked Published. It is not Live until cms publish and cms deploy have run.")
     return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
@@ -107,6 +110,7 @@ def publish_post(request: Request, post_id: int):
 def unpublish_post(request: Request, post_id: int):
     _found(request, post_id)
     posts.unpublish(_db(request), post_id)
+    flash(request, "Marked Draft. It leaves the public site after the next cms publish and cms deploy.")
     return RedirectResponse(_edit_url(request, post_id), status_code=303)
 
 
@@ -114,6 +118,7 @@ def unpublish_post(request: Request, post_id: int):
 def delete_post(request: Request, post_id: int):
     _found(request, post_id)
     posts.delete(_db(request), post_id)
+    flash(request, "Post deleted.")
     return RedirectResponse(request.app.url_path_for("post_list"), status_code=303)
 
 
@@ -133,4 +138,5 @@ def change_slug(request: Request, post_id: int, slug: str = Form("")):
         code = 409 if isinstance(error, posts.SlugTaken) else 400
         return _form(request, post=post, status_code=code, slug_error=str(error),
                      title_value=post["title"], body_value=post["body"])
+    flash(request, "Slug changed. An old link to this Post may no longer work.")
     return RedirectResponse(_edit_url(request, post_id), status_code=303)

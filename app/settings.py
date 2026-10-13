@@ -1,10 +1,21 @@
-"""Configuration, read from the environment (never hard-code secrets)."""
+"""Configuration, read from the environment (never hard-code secrets).
+
+A `.env` file at the repository root is read first, so `cp .env.example .env` is
+enough and no `--env-file` flag is needed. A variable that is already set in the
+real environment always wins over the file, and nothing here prints a value.
+`CMS_ENV_FILE` names a different file (the tests point it at nothing, so they never read yours).
+"""
 from __future__ import annotations
 
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 ROOT = Path(__file__).resolve().parents[1]
+# python-dotenv is already locked: uvicorn[standard], which pyproject declares, requires it.
+# interpolate=False keeps a `$` in a password literal instead of expanding `${...}`.
+load_dotenv(os.environ.get("CMS_ENV_FILE", ROOT / ".env"), override=False, interpolate=False)
 TEMPLATES = ROOT / "templates"
 SITE = ROOT / "site"
 # Approved image files, added by the release-holder; `cms publish` copies them.

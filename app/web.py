@@ -33,9 +33,15 @@ def stamp(iso: str) -> str:
 templates.env.filters["stamp"] = stamp
 
 
+def flash(request: Request, message: str) -> None:
+    """Remember a success message for the next screen. It is shown once."""
+    request.session["flash"] = message
+
+
 def render(request: Request, name: str, status_code: int = 200, **context):
     """Render an admin template with the CSRF token every form needs."""
     context.setdefault("title", "Admin")
     context["csrf_token"] = security.csrf_token(request)
+    context["flash"] = request.session.pop("flash", None)
     context["home_path"] = request.app.url_path_for("dashboard")
     return templates.TemplateResponse(request, name, context, status_code=status_code)

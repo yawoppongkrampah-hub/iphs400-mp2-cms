@@ -11,6 +11,16 @@
     body { margin: 0; font: 1rem/1.5 system-ui, sans-serif; color: var(--ink); background: #fff; }
     header, main, footer { max-width: 44rem; margin: 0 auto; padding: 0.75rem 1rem; }
     header { border-bottom: 1px solid var(--line); font-weight: 600; }
+    main { overflow-wrap: anywhere; }
+    .admin-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; }
+    .admin-nav a { display: inline-block; min-height: 2.75rem; padding: 0.5rem 0.5rem; line-height: 1.75rem; }
+    .admin-nav a[aria-current="page"] { color: var(--ink); text-decoration: none; border-bottom: 3px solid var(--accent); }
+    .admin-nav form { margin: 0 0 0 auto; }
+    .flash, [role="alert"] { padding: 0.75rem 1rem; border-left: 4px solid; }
+    .flash { border-color: #1a7f37; background: #eef8f0; }
+    [role="alert"] { border-color: #b3261e; background: #fdf1f0; }
+    textarea { display: block; width: 100%; max-width: 100%; font: inherit; }
+    input:not([type="hidden"]) { max-width: 100%; }
     a { color: var(--accent); }
     a:focus-visible, button:focus-visible { outline: 3px solid #f2a900; outline-offset: 2px; }
     h1 { font-size: 1.5rem; margin: 0.5rem 0 1rem; }
@@ -34,8 +44,32 @@
   </style>
 </head>
 <body>
-  <header><a href="{{ home_path | default('index.html') }}">{{ title }}</a></header>
-  <main>{% block content %}{% endblock %}</main>
+  <header>
+    {% if user %}
+    {% set path = request.url.path %}
+    {% macro item(label, name) -%}
+    {% set href = route(name) -%}
+    <a href="{{ href }}"{% if path == href or (name != 'dashboard' and path.startswith(href + '/')) %} aria-current="page"{% endif %}>{{ label }}</a>
+    {%- endmacro %}
+    <nav class="admin-nav" aria-label="Admin">
+      {{ item('Dashboard', 'dashboard') }}
+      {{ item('Content', 'content_list') }}
+      {{ item('Posts', 'post_list') }}
+      {{ item('Pages', 'page_list') }}
+      {% if can(user.role, 'user.list') %}{{ item('Accounts', 'user_list') }}{% endif %}
+      <form method="post" action="{{ route('logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit">Sign out</button>
+      </form>
+    </nav>
+    {% else %}
+    {{ title }}
+    {% endif %}
+  </header>
+  <main>
+    {% if flash %}<p class="flash" role="status">{{ flash }}</p>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
   <footer><small>IPHS 400 Mini-Project #2</small></footer>
 </body>
 </html>
